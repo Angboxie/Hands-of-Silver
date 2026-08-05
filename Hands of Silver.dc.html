@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@1,6..96,400;1,6..96,500&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet" />
+<style>
+@font-face { font-family: 'Canterbury'; src: url('assets/fonts/canterbury.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'BlackChancery'; src: url('assets/fonts/blackchancery.ttf') format('truetype'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Brotheric'; src: url('assets/fonts/brotheric.otf') format('opentype'); font-weight: 400; font-display: swap; }
+html { background: #050606; }
+body { margin: 0; background: #050606; color: #B6B8B8; font-family: 'Jost',sans-serif; font-weight: 300; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+* { box-sizing: border-box; }
+a { color: inherit; text-decoration: none; transition: color .5s cubic-bezier(.16,1,.3,1); }
+a:hover { color: #F3F3F4; }
+::selection { background: #B6B8B8; color: #050606; }
+input, button { font-family: inherit; font-weight: 300; }
+input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid currentColor; outline-offset: 4px; }
+@keyframes hos-in { from { opacity: 0; transform: translate3d(0,26px,0); } to { opacity: 1; transform: none; } }
+@keyframes hos-rise { from { transform: perspective(1100px) rotateX(7deg) translate3d(0,34px,-50px); } to { transform: none; } }
+@keyframes hos-mask { from { opacity: 0; transform: translate3d(0,102%,0); } to { opacity: 1; transform: none; } }
+[data-in] { animation: hos-in 1.15s cubic-bezier(.16,1,.3,1) both; }
+[data-in="1"] { animation-delay: .10s; }
+[data-in="2"] { animation-delay: .22s; }
+[data-in="3"] { animation-delay: .34s; }
+[data-in="4"] { animation-delay: .46s; }
+[data-reveal] { animation: hos-rise 1.05s cubic-bezier(.16,1,.3,1) both; }
+[data-line] > * { display: block; }
+[data-line].hos-play > * { animation: hos-mask 1.25s cubic-bezier(.16,1,.3,1) both; }
+@supports (animation-timeline: view()) {
+  [data-reveal] { animation-timeline: view(); animation-range: entry 4% cover 26%; animation-delay: 0s; }
+  [data-line] > * { animation: hos-mask 1.25s cubic-bezier(.16,1,.3,1) both; animation-timeline: view(); animation-range: entry 10% cover 30%; }
+}
+[data-reveal].hos-wait { animation: none; }
+@keyframes hos-swap { from { opacity: 0; transform: scale(1.05); } to { opacity: 1; transform: none; } }
+@keyframes hos-halo { 0%,100% { opacity: .16; transform: scale(1); } 50% { opacity: .36; transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { [data-anim] { animation: none !important; } }
+</style>
+</helmet>
+
+<div id="top" style="position: relative; width: 100%; background: #050606;">
+
+  <div style="position: fixed; top: 0; left: 0; right: 0; height: 1px; z-index: 96; background: rgba(102,107,112,.3);">
+    <div data-progress="" style="height: 100%; width: 100%; background: linear-gradient(90deg,#666B70,#F3F3F4,#71808C); transform: scaleX(0); transform-origin: 0 50%;"></div>
+  </div>
+
+  <div data-curtain="" style="position: fixed; inset: 0; z-index: 95; overflow: hidden; pointer-events: none; perspective: 1100px;">
+    <span data-cveil="" style="position: absolute; inset: 0; background: radial-gradient(60% 60% at 50% 50%, rgba(5,6,6,.72), rgba(5,6,6,.9)); opacity: 0;"></span>
+    <sc-for list="{{ rings }}" as="r">
+      <span data-cring="" data-d="{{ r.d }}" style="position: absolute; left: 50%; top: 50%; width: {{ r.s }}; height: {{ r.s }}; margin: {{ r.m }} 0 0 {{ r.m }}; border-radius: 50%; background: {{ r.g }}; -webkit-mask: radial-gradient(closest-side, transparent calc(100% - {{ r.b }}), #000 calc(100% - {{ r.b }})); mask: radial-gradient(closest-side, transparent calc(100% - {{ r.b }}), #000 calc(100% - {{ r.b }})); opacity: 0; will-change: transform, opacity;"></span>
+    </sc-for>
+  </div>
+
+  <nav data-nav="" style="position: fixed; top: 1px; left: 0; right: 0; z-index: 90; height: 78px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 0 clamp(18px,4vw,60px); border-bottom: 1px solid transparent; transition: background .6s ease, border-color .6s ease;">
+    <button type="button" data-go="home" onClick="{{ onGo }}" aria-label="Hands of Silver — home" style="display: flex; align-items: center; background: none; border: 0; padding: 0; cursor: pointer;">
+      <img src="assets/logo-trim.png" alt="Hands of Silver" style="height: 52px; width: auto; display: block;" />
+    </button>
+    <div style="display: flex; align-items: center; gap: clamp(15px,2.3vw,32px);">
+      <button type="button" data-go="shop" onClick="{{ onGo }}" style="background: none; border: 0; padding: 5px 0; border-bottom: 1px solid {{ nShop }}; font-size: 10px; font-weight: 400; letter-spacing: .3em; text-transform: uppercase; color: {{ nShopFg }}; cursor: pointer; transition: color .5s, border-color .5s;">Shop</button>
+      <button type="button" data-go="commission" onClick="{{ onGo }}" style="background: none; border: 0; padding: 5px 0; border-bottom: 1px solid {{ nComm }}; font-size: 10px; font-weight: 400; letter-spacing: .3em; text-transform: uppercase; color: {{ nCommFg }}; cursor: pointer; transition: color .5s, border-color .5s;">Commission</button>
+    </div>
+  </nav>
+
+  <!-- ══════════ HOME ══════════ -->
+  <sc-if value="{{ vHome }}" hint-placeholder-val="{{ true }}">
+    <div>
+
+      <!-- I · HERO -->
+      <header style="position: relative; min-height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 106px clamp(18px,4vw,60px) 48px;">
+        <div data-anim="" style="position: absolute; left: 50%; top: 48%; width: min(960px,106vw); aspect-ratio: 1; margin: min(-480px,-53vw) 0 0 min(-480px,-53vw); pointer-events: none; border-radius: 50%; background: radial-gradient(closest-side, rgba(113,128,140,.3), rgba(102,107,112,.08) 54%, rgba(5,6,6,0) 76%); animation: hos-halo 15s ease-in-out infinite;"></div>
+
+        <div style="position: relative; width: 100%; max-width: 1320px; margin: 0 auto;">
+          <div style="display: flex; align-items: center; justify-content: center; gap: clamp(12px,2.6vw,44px);">
+            <span data-in="1" style="font-family: 'Canterbury','Bodoni Moda',serif; font-weight: 400; font-size: clamp(58px,15vw,232px); line-height: .84; letter-spacing: .07em; color: #F3F3F4;">AD</span>
+            <span data-o="" style="position: relative; flex: none; width: clamp(58px,15vw,228px); aspect-ratio: 1; will-change: transform;">
+              <img src="assets/bracelet-o.png" alt="Rosette weave chainmaille bracelet" style="position: absolute; inset: -13%; width: 126%; height: 126%; object-fit: contain; display: block;" />
+            </span>
+            <span data-in="2" style="font-family: 'Canterbury','Bodoni Moda',serif; font-weight: 400; font-size: clamp(58px,15vw,232px); line-height: .84; letter-spacing: .07em; color: #F3F3F4;">RN</span>
+          </div>
+
+          <div data-in="3" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: clamp(30px,4vw,58px);">
+            <button type="button" data-go="commission" onClick="{{ onGo }}" style="height: 54px; padding: 0 34px; background: #F3F3F4; color: #050606; border: 0; font-size: 10px; font-weight: 500; letter-spacing: .32em; text-transform: uppercase; cursor: pointer; transition: background .5s cubic-bezier(.16,1,.3,1);" style-hover="background:#B6B8B8">Commission</button>
+            <button type="button" data-go="shop" onClick="{{ onGo }}" style="height: 54px; padding: 0 30px; background: transparent; border: 1px solid #666B70; color: #F3F3F4; font-size: 10px; letter-spacing: .32em; text-transform: uppercase; cursor: pointer; transition: background .5s, border-color .5s;" style-hover="background:rgba(243,243,244,.08);border-color:#F3F3F4">Shop</button>
+          </div>
+        </div>
+
+      </header>
+
+      <!-- II · MANIFESTO on silver -->
+      <section style="position: relative; overflow: hidden; background: #B6B8B8; color: #050606; padding: clamp(56px,6.6vw,104px) clamp(18px,4vw,60px);">
+        <div style="max-width: 1320px; margin: 0 auto;">
+          <div style="display: flex; flex-direction: column; gap: clamp(2px,.6vw,10px);">
+            <sc-for list="{{ creed }}" as="c" hint-placeholder-count="3">
+              <div data-line="" style="overflow: hidden; padding-top: clamp(10px,1.7vw,30px);">
+                <span style="display: block; font-family: 'BlackChancery','Bodoni Moda',serif; font-weight: 400; font-size: clamp(34px,7.4vw,126px); line-height: .96; letter-spacing: -.01em; color: {{ c.col }};">{{ c.t }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <p data-reveal="" style="margin: clamp(28px,3.6vw,54px) 0 0; max-width: 40ch; font-size: clamp(14px,1.15vw,16.5px); line-height: 1.75; color: #343534; text-wrap: pretty;">A single maker, a single pair of pliers. Every link is opened, threaded and closed by hand until the piece holds its own weight.</p>
+        </div>
+      </section>
+
+      <!-- III · CONTINUOUS ZOOM -->
+      <section data-zoomsec="" style="position: relative; height: 560vh;">
+        <div data-zstage="" style="position: sticky; top: 0; height: 100vh; overflow: hidden; background: #050606; transition: background 1.4s cubic-bezier(.16,1,.3,1);">
+
+          <div data-zframe="" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4%; padding: 8vh 6vw; will-change: transform;">
+            <span data-zp="l" style="flex: 1 1 0; max-width: 42%; height: 74%; display: block;">
+              <img src="assets/daggers.png" alt="Chainmaille cross earrings with spike drops" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+            </span>
+            <span data-zp="r" style="flex: 1 1 0; max-width: 42%; height: 74%; display: block;">
+              <img src="assets/sanguine.png" alt="Chainmaille chandelier earrings with red glass drops" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+            </span>
+          </div>
+
+          <div style="position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: clamp(16px,2.4vw,40px); padding: clamp(24px,3vw,44px) clamp(18px,4vw,60px);">
+            <div data-zcap="" style="flex: 1 1 300px; max-width: 46ch; will-change: transform, opacity;">
+              <span data-zn="" style="display: block; font-size: 10px; font-weight: 400; letter-spacing: .34em; text-transform: uppercase; color: #B6B8B8;">01</span>
+              <span data-zt="" style="display: block; margin-top: 12px; font-family: 'BlackChancery','Bodoni Moda',serif; font-weight: 400; font-size: clamp(24px,3.2vw,50px); line-height: 1.04; color: #F3F3F4;">&nbsp;</span>
+              <span data-zd="" style="display: block; margin-top: 14px; font-size: 14px; line-height: 1.7; color: #B6B8B8; text-wrap: pretty;">&nbsp;</span>
+            </div>
+            <div style="display: flex; flex: none; gap: 5px;">
+              <sc-for list="{{ stages }}" as="s">
+                <span data-zdot="" style="display: block; width: 24px; height: 2px; background: rgba(182,184,184,.3); transition: background .7s cubic-bezier(.16,1,.3,1);"></span>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- IV · THE MAKER on paper -->
+      <section style="position: relative; overflow: hidden; background: #F3F3F4; color: #050606; padding: clamp(56px,6.6vw,104px) clamp(18px,4vw,60px);">
+        <div style="max-width: 1320px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: clamp(28px,4vw,72px);">
+          <div data-reveal="" style="flex: 1 1 300px; min-width: 262px;">
+            <p style="margin: 0; max-width: 19ch; font-family: 'BlackChancery','Bodoni Moda',serif; font-weight: 400; font-size: clamp(28px,3.6vw,54px); line-height: 1.08; ">One woman, one pair of pliers.</p>
+            <p style="margin: 24px 0 0; max-width: 38ch; font-size: 14.5px; line-height: 1.75; color: #343534; text-wrap: pretty;">She started with a single collar for herself and never bought a jump ring by the hundred again. Everything leaving the studio has passed through her hands twice — once to build it, once to test it will survive being worn.</p>
+          </div>
+          <div data-reveal="" style="flex: 1 1 300px; min-width: 262px;">
+            <sc-for list="{{ facts }}" as="f" hint-placeholder-count="3">
+              <div style="display: flex; align-items: baseline; gap: 16px; padding: 16px 0; border-top: 1px solid #B6B8B8;">
+                <span style="flex: none; width: 72px; font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: #666B70;">{{ f.k }}</span>
+                <span style="flex: 1; font-size: 14px; line-height: 1.65; color: #050606; text-wrap: pretty;">{{ f.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <!-- V · TWO WAYS -->
+      <section style="position: relative; overflow: hidden; background: #343534; padding: clamp(56px,6.6vw,104px) clamp(18px,4vw,60px);">
+        <div style="max-width: 1320px; margin: 0 auto;">
+          <h2 data-reveal="" style="margin: 0; max-width: 14ch; font-family: 'Canterbury','Bodoni Moda',serif; font-weight: 400; font-size: clamp(28px,4vw,66px); line-height: 1; color: #F3F3F4;">Two ways in</h2>
+
+          <div style="display: flex; flex-wrap: wrap; gap: clamp(16px,2.2vw,30px); margin-top: clamp(26px,3.2vw,46px);">
+            <div data-reveal="" data-tier="" style="position: relative; flex: 1.45 1 340px; min-width: 290px; display: flex; flex-direction: column; justify-content: space-between; gap: 30px; padding: clamp(26px,3vw,46px); background: linear-gradient(152deg,#F3F3F4 0%,#B6B8B8 22%,#666B70 46%,#F3F3F4 68%,#71808C 88%,#343534 100%); color: #050606; overflow: hidden;">
+              <div>
+                <span style="font-size: 9.5px; font-weight: 500; letter-spacing: .34em; text-transform: uppercase;">The higher way</span>
+                <h3 style="margin: 18px 0 0; font-family: 'Canterbury','Bodoni Moda',serif; font-weight: 400; font-size: clamp(32px,4.4vw,74px); line-height: .96; ">Commission</h3>
+                <p style="margin: 18px 0 0; max-width: 30ch; font-size: 14.5px; line-height: 1.7; color: #1a1c1c; text-wrap: pretty;">Four questions, a drawing back within two working days, then a piece that exists once. Your weave, your length, your metal.</p>
+              </div>
+              <button type="button" data-go="commission" onClick="{{ onGo }}" style="align-self: flex-start; height: 54px; padding: 0 34px; background: #050606; color: #F3F3F4; border: 0; font-size: 10px; font-weight: 500; letter-spacing: .32em; text-transform: uppercase; cursor: pointer; transition: background .5s cubic-bezier(.16,1,.3,1);" style-hover="background:#666B70">Begin a commission</button>
+            </div>
+
+            <div data-reveal="" data-tier="" style="flex: 1 1 280px; min-width: 262px; display: flex; flex-direction: column; justify-content: space-between; gap: 30px; padding: clamp(26px,3vw,46px); background: #050606; border: 1px solid #666B70;">
+              <div>
+                <span style="font-size: 9.5px; letter-spacing: .34em; text-transform: uppercase; color: #666B70;">The quicker way</span>
+                <h3 style="margin: 18px 0 0; font-family: 'Canterbury','Bodoni Moda',serif; font-weight: 400; font-size: clamp(26px,3.2vw,50px); line-height: 1; color: #F3F3F4;">The shop</h3>
+                <p style="margin: 18px 0 0; max-width: 30ch; font-size: 14px; line-height: 1.7; color: #B6B8B8; text-wrap: pretty;">Designs she already knows by heart, built fresh to your size. Two steps and it's in the diary.</p>
+              </div>
+              <button type="button" data-go="shop" onClick="{{ onGo }}" style="align-self: flex-start; height: 52px; padding: 0 30px; background: transparent; border: 1px solid #666B70; color: #F3F3F4; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; cursor: pointer; transition: background .5s, border-color .5s;" style-hover="background:rgba(243,243,244,.08);border-color:#F3F3F4">See the shop</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </sc-if>
+
+  <!-- ══════════ SHOP ══════════ -->
+  <sc-if value="{{ vShop }}" hint-placeholder-val="{{ false }}">
+    <div style="min-height: 100vh; padding: 112px clamp(18px,4vw,60px) clamp(40px,4.6vw,68px);">
+      <div style="max-width: 1440px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: flex-start; gap: clamp(20px,2.6vw,40px);">
+
+        <!-- filter rail -->
+        <div style="flex: 1 1 210px; min-width: 200px; max-width: 262px; display: flex; flex-direction: column; gap: clamp(20px,2.4vw,32px);">
+          <h1 style="margin: 0; font-family: 'Canterbury','Bodoni Moda',serif; font-weight: 400; font-size: clamp(34px,4.4vw,64px); line-height: .9; color: #F3F3F4;">Shop</h1>
+
+          <label style="display: flex; align-items: center; gap: 10px; padding-bottom: 9px; border-bottom: 1px solid #666B70;">
+            <span aria-hidden="true" style="flex: none; font-size: 13px; color: #666B70;">⌕</span>
+            <input data-search="" onChange="{{ onSearch }}" value="{{ q }}" type="search" placeholder="Search pieces" aria-label="Search pieces" style="flex: 1; min-width: 0; background: transparent; border: 0; color: #F3F3F4; font-size: 14px; padding: 2px 0;" />
+          </label>
+
+          <div style="display: flex; flex-direction: column; gap: 11px;">
+            <span style="font-size: 9.5px; letter-spacing: .3em; text-transform: uppercase; color: #666B70;">Kind</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <sc-for list="{{ chips }}" as="c" hint-placeholder-count="4">
+                <button type="button" data-cat="{{ c.v }}" onClick="{{ onCat }}" aria-pressed="{{ c.sel }}" style="height: 34px; padding: 0 14px; background: {{ c.bg }}; border: 1px solid {{ c.bd }}; color: {{ c.fg }}; font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; transition: background .45s, color .45s, border-color .45s;">{{ c.v }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 11px;">
+            <span style="font-size: 9.5px; letter-spacing: .3em; text-transform: uppercase; color: #666B70;">Edge</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <sc-for list="{{ mchips }}" as="m" hint-placeholder-count="4">
+                <button type="button" data-mood="{{ m.v }}" onClick="{{ onMood }}" aria-pressed="{{ m.sel }}" style="height: 34px; padding: 0 14px; background: {{ m.bg }}; border: 1px solid {{ m.bd }}; color: {{ m.fg }}; font-size: 9.5px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; transition: background .45s, color .45s, border-color .45s;">{{ m.v }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding-top: 14px; border-top: 1px solid #343534;">
+            <span style="font-size: 9.5px; letter-spacing: .26em; text-transform: uppercase; color: #666B70;">{{ found }}</span>
+            <button type="button" onClick="{{ onClearFilters }}" style="background: none; border: 0; padding: 0; font-size: 9.5px; letter-spacing: .22em; text-transform: uppercase; color: {{ clearFg }}; cursor: pointer; transition: color .4s;">Reset</button>
+          </div>
+
+          <button type="button" data-go="commission" onClick="{{ onGo }}" style="align-self: flex-start; padding: 0 0 5px; background: none; border: 0; border-bottom: 1px solid #666B70; color: #B6B8B8; font-size: 9.5px; letter-spacing: .26em; text-transform: uppercase; cursor: pointer; transition: color .45s, border-color .45s;" style-hover="color:#F3F3F4;border-color:#F3F3F4">Or commission one</button>
+        </div>
+
+        <!-- the piece on show -->
+        <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+          <div style="flex: 2.1 1 400px; min-width: 288px; display: flex; flex-direction: column; gap: 18px;">
+            <div data-hero-slot="" style="position: relative; width: 100%; aspect-ratio: 5/4; max-height: 56vh; overflow: hidden; background: radial-gradient(58% 54% at 50% 44%, #1c1e1f, #070808 78%); border: 1px solid #343534;">
+              <img data-cur-img="" src="assets/chain.png" alt="Selected piece" style="width: 100%; height: 100%; object-fit: contain; display: block; padding: 4%;" />
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px;">
+              <div style="flex: 1 1 240px;">
+                <span style="display: block; font-family: 'Brotheric','Bodoni Moda',serif; font-weight: 400; font-size: clamp(24px,3vw,42px); line-height: 1; color: #F3F3F4;">{{ curName }}</span>
+                <span style="display: block; margin-top: 10px; max-width: 40ch; font-size: 13.5px; line-height: 1.6; color: #B6B8B8;">{{ curDesc }}</span>
+                <span style="display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; font-size: 9.5px; letter-spacing: .24em; text-transform: uppercase; color: #666B70;">
+                  <span>{{ curKind }}</span><span>·</span><span>{{ curMood }} edge</span><span>·</span><span>Made to your size</span>
+                </span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 18px;">
+                <span style="font-size: clamp(19px,2vw,26px); font-weight: 400; letter-spacing: .02em; color: #E1E2E2;">{{ curPrice }}</span>
+                <button type="button" onClick="{{ onRailOrder }}" style="height: 52px; padding: 0 32px; background: #F3F3F4; color: #050606; border: 0; font-size: 10px; font-weight: 500; letter-spacing: .3em; text-transform: uppercase; cursor: pointer; transition: background .5s cubic-bezier(.16,1,.3,1);" style-hover="background:#B6B8B8">Order</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- results, one tap each -->
+          <div style="flex: 1 1 232px; min-width: 216px; max-width: 300px; display: flex; flex-direction: column; gap: 6px;">
+            <sc-for list="{{ results }}" as="r" hint-placeholder-count="5">
+              <button type="button" data-i="{{ r.i }}" onClick="{{ onThumb }}" aria-pressed="{{ r.sel }}" style="display: flex; align-items: center; gap: 13px; padding: 9px; background: {{ r.bg }}; border: 1px solid {{ r.bd }}; text-align: left; cursor: pointer; transition: background .45s, border-color .45s, transform .5s cubic-bezier(.16,1,.3,1);" style-hover="border-color:#F3F3F4;transform:translateX(-4px)">
+                <span style="flex: none; width: 46px; height: 46px; overflow: hidden; background: #0d0e0e;"><img src="assets/chain.png" data-src="{{ r.src }}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block;" /></span>
+                <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+                  <span style="font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: {{ r.fg }};">{{ r.name }}</span>
+                  <span style="font-size: 12px; color: #666B70;">{{ r.price }}</span>
+                </span>
+              </button>
+            </sc-for>
+            <span style="margin-top: 8px; font-size: 9.5px; letter-spacing: .26em; text-transform: uppercase; color: #666B70;">↑ ↓ to browse</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+          <div style="flex: 3 1 400px; min-width: 288px; display: flex; flex-direction: column; align-items: flex-start; gap: 18px; padding: clamp(30px,4vw,60px); border: 1px solid #343534;">
+            <span style="font-family: 'BlackChancery','Bodoni Moda',serif; font-size: clamp(22px,2.6vw,38px); line-height: 1.1; color: #F3F3F4;">Nothing matches that.</span>
+            <span style="max-width: 34ch; font-size: 14px; line-height: 1.7; color: #B6B8B8;">She can make it anyway — that is what a commission is for.</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+              <button type="button" data-go="commission" onClick="{{ onGo }}" style="height: 50px; padding: 0 30px; background: #F3F3F4; color: #050606; border: 0; font-size: 10px; font-weight: 500; letter-spacing: .3em; text-transform: uppercase; cursor: pointer; transition: background .5s;" style-hover="background:#B6B8B8">Commission</button>
+              <button type="button" onClick="{{ onClearFilters }}" style="height: 50px; padding: 0 26px; background: transparent; border: 1px solid #666B70; color: #F3F3F4; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; cursor: pointer; transition: background .5s, border-color .5s;" style-hover="background:rgba(243,243,244,.08);border-color:#F3F3F4">Reset filters</button>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ══════════ FORM ══════════ -->
+  <sc-if value="{{ vForm }}" hint-placeholder-val="{{ false }}">
+    <div style="min-height: 100vh; background: #F3F3F4; color: #050606; padding: 112px clamp(18px,4vw,60px) clamp(56px,6.6vw,96px);">
+      <div style="max-width: 1080px; margin: 0 auto;">
+        <button type="button" data-go="{{ backTo }}" onClick="{{ onGo }}" style="background: none; border: 0; padding: 0; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: #666B70; cursor: pointer;" style-hover="color:#050606">← {{ backLabel }}</button>
+
+        <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-top: 20px; padding-bottom: 20px; border-bottom: 1px solid #050606;">
+          <h1 style="margin: 0; font-family: 'Canterbury','Bodoni Moda',serif; font-weight: 400; font-size: clamp(32px,4.4vw,68px); line-height: .96; ">{{ title }}</h1>
+          <span style="font-size: 10px; letter-spacing: .32em; text-transform: uppercase; color: #666B70; padding-bottom: 8px;">{{ subtitle }}</span>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: clamp(26px,4vw,60px); margin-top: clamp(24px,3vw,42px);">
+          <div style="flex: 2 1 400px; min-width: 288px;">
+            <sc-if value="{{ open }}" hint-placeholder-val="{{ true }}">
+              <div style="display: flex; flex-direction: column; gap: 26px;">
+                <div>
+                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 14px;">
+                    <span aria-live="polite" style="font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: #666B70;">{{ stepLabel }}</span>
+                    <button type="button" onClick="{{ onReset }}" style="background: none; border: 0; padding: 0; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: #666B70; cursor: pointer;" style-hover="color:#050606">Clear</button>
+                  </div>
+                  <div style="display: flex; gap: 4px; margin-top: 12px;">
+                    <sc-for list="{{ bars }}" as="b" hint-placeholder-count="3">
+                      <span style="flex: 1; height: 2px; background: {{ b.c }}; transition: background .6s cubic-bezier(.16,1,.3,1);"></span>
+                    </sc-for>
+                  </div>
+                </div>
+
+                <div data-step="" style="display: flex; flex-direction: column; gap: 16px; min-height: 210px;">
+                  <h2 style="margin: 0; font-family: 'Brotheric','Bodoni Moda',serif; font-weight: 400; font-size: clamp(22px,2.4vw,34px); line-height: 1.06; ">{{ stepTitle }}</h2>
+
+                  <sc-if value="{{ isChoice }}" hint-placeholder-val="{{ true }}">
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <sc-for list="{{ choices }}" as="c">
+                          <button type="button" data-f="{{ c.f }}" data-v="{{ c.v }}" onClick="{{ onPick }}" style="position: relative; flex: 1 1 {{ c.w }}; min-height: {{ c.h }}; display: flex; align-items: center; gap: 12px; padding: 12px 15px; background: transparent; border: 1px solid #B6B8B8; text-align: left; cursor: pointer; transition: border-color .5s cubic-bezier(.16,1,.3,1);" style-hover="border-color:#050606">
+                            <sc-if value="{{ c.hasImg }}" hint-placeholder-val="{{ false }}">
+                              <span style="flex: none; width: 44px; height: 44px; overflow: hidden; border-radius: 50%; background: #0d0e0e;"><img src="assets/chain.png" data-src="{{ c.src }}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block;" /></span>
+                            </sc-if>
+                            <span style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+                              <span style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase;">{{ c.v }}</span>
+                              <sc-if value="{{ c.hasD }}" hint-placeholder-val="{{ true }}"><span style="font-size: 13px; color: #666B70;">{{ c.d }}</span></sc-if>
+                            </span>
+                            <sc-if value="{{ c.sel }}" hint-placeholder-val="{{ false }}"><span style="position: absolute; inset: -1px; border: 2px solid #050606; pointer-events: none;"></span></sc-if>
+                          </button>
+                        </sc-for>
+                      </div>
+                      <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #666B70;">{{ stepHelp }}</p>
+                    </div>
+                  </sc-if>
+
+                  <sc-if value="{{ isContact }}" hint-placeholder-val="{{ false }}">
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                      <div style="display: flex; flex-wrap: wrap; gap: 18px;">
+                        <label style="flex: 1 1 190px; display: flex; flex-direction: column; gap: 8px;">
+                          <span style="font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: #666B70;">Name</span>
+                          <input data-f="name" onChange="{{ onField }}" value="{{ name }}" type="text" autocomplete="name" style="background: transparent; border: 0; border-bottom: 1px solid #050606; color: #050606; font-size: 16px; padding: 8px 0;" />
+                        </label>
+                        <label style="flex: 1 1 190px; display: flex; flex-direction: column; gap: 8px;">
+                          <span style="font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: #666B70;">Email</span>
+                          <input data-f="email" onChange="{{ onField }}" value="{{ email }}" type="email" inputmode="email" autocomplete="email" style="background: transparent; border: 0; border-bottom: 1px solid #050606; color: #050606; font-size: 16px; padding: 8px 0;" />
+                        </label>
+                      </div>
+                      <p style="margin: 0; font-size: 13px; line-height: 1.65; color: #666B70;">{{ stepHelp }}</p>
+                    </div>
+                  </sc-if>
+                </div>
+
+                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding-top: 20px; border-top: 1px solid #B6B8B8;">
+                  <button type="button" onClick="{{ onBack }}" style="background: none; border: 0; padding: 6px 0; font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: {{ backColor }}; cursor: pointer;">← Back</button>
+                  <div style="display: flex; align-items: center; gap: 18px;">
+                    <span aria-live="polite" style="font-size: 13px; color: #666B70;">{{ hint }}</span>
+                    <button type="button" onClick="{{ onNext }}" style="height: 52px; padding: 0 32px; border: 1px solid #050606; background: {{ nextBg }}; color: {{ nextFg }}; font-size: 10px; font-weight: 500; letter-spacing: .28em; text-transform: uppercase; cursor: pointer; transition: background .5s cubic-bezier(.16,1,.3,1);">{{ nextLabel }}</button>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; justify-content: center; gap: 16px; min-height: 290px;">
+                <span style="font-size: 10px; letter-spacing: .32em; text-transform: uppercase; color: #666B70;">{{ ref }}</span>
+                <h2 style="margin: 0; font-family: 'BlackChancery','Bodoni Moda',serif; font-weight: 400; font-size: clamp(26px,3vw,44px); line-height: 1.06; ">It's written down.</h2>
+                <p style="margin: 0; max-width: 40ch; font-size: 15px; line-height: 1.7; color: #343534;">{{ sentNote }}</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                  <button type="button" data-go="shop" onClick="{{ onGo }}" style="height: 48px; padding: 0 26px; background: #050606; color: #F3F3F4; border: 0; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; cursor: pointer; transition: background .5s;" style-hover="background:#343534">Shop</button>
+                  <button type="button" onClick="{{ onReset }}" style="height: 48px; padding: 0 26px; background: transparent; border: 1px solid #050606; color: #050606; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; cursor: pointer; transition: background .5s, color .5s;" style-hover="background:#050606;color:#F3F3F4">Start another</button>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+          <aside style="flex: 1 1 248px; min-width: 232px; align-self: flex-start;">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid #050606;">
+              <span style="font-size: 10px; letter-spacing: .32em; text-transform: uppercase;">Slip</span>
+              <span style="font-size: 10px; letter-spacing: .14em; color: #666B70;">{{ ref }}</span>
+            </div>
+            <sc-for list="{{ slip }}" as="l" hint-placeholder-count="4">
+              <div style="display: flex; align-items: baseline; gap: 12px; padding: 11px 0; border-bottom: 1px solid #B6B8B8;">
+                <span style="flex: none; width: 56px; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #666B70;">{{ l.k }}</span>
+                <span style="flex: 1; font-size: 15px; line-height: 1.35; color: {{ l.c }};">{{ l.v }}</span>
+              </div>
+            </sc-for>
+            <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 22px;">
+              <div>
+                <div style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #666B70;">{{ totalLabel }}</div>
+                <div style="font-size: 23px; font-weight: 400; letter-spacing: .02em; line-height: 1.2; margin-top: 6px;">{{ estimate }}</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #666B70;">In hand</div>
+                <div style="font-size: 14px; margin-top: 8px;">{{ ready }}</div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <footer style="position: relative; background: #050606; padding: clamp(26px,3.4vw,48px) clamp(18px,4vw,60px) clamp(30px,3.8vw,52px);">
+    <div style="max-width: 1320px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; padding-top: 26px; border-top: 1px solid #343534;">
+      <img src="assets/logo-trim.png" alt="Hands of Silver" style="height: 46px; width: auto; display: block;" />
+      <div style="display: flex; flex-wrap: wrap; gap: 12px 26px; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: #666B70;">
+        <button type="button" data-go="shop" onClick="{{ onGo }}" style="background: none; border: 0; padding: 0; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer;">Shop</button>
+        <button type="button" data-go="commission" onClick="{{ onGo }}" style="background: none; border: 0; padding: 0; font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; cursor: pointer;">Commission</button>
+        <span>© 2026</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;finish&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Mirror&quot;,&quot;Brushed&quot;,&quot;Blackened&quot;],&quot;default&quot;:&quot;Mirror&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Metal&quot;}}">
+const E = 'cubic-bezier(.16,1,.3,1)';
+
+class Component extends DCLogic {
+  state = { view: 'home', mode: 'commission', cat: 'All', edge: 'Any', q: '', cur: 0, step: 0, sent: false,
+    o: { house: '', piece: '', mood: '', fit: '', name: '', email: '' } };
+
+  // ---- THE CATALOG -------------------------------------------------------
+  // To add a piece: copy a line, change every field. That's it — shop grid,
+  // search, filters and the order form all read from this one list.
+  //   name  → shown everywhere
+  //   price → string, keep the £ sign
+  //   d     → one-line description on the product card
+  //   src   → path to the photo, under assets/
+  //   fit   → 'contain' (whole piece visible) or 'cover' (fills the frame)
+  //   alt   → alt text for the photo (accessibility + SEO, keep it descriptive)
+  //   kind  → 'Necklaces' | 'Earrings' | 'Bracelets' (must match a shop filter)
+  //   mood  → 'Soft' | 'Sharp' | 'Feral' (used to pre-fill the commission form)
+  ALL = [
+    { name: 'Spike Collar', price: '£340', d: 'Byzantine chain, nine graduated spikes.',
+      src: 'assets/chain.png', fit: 'contain', alt: 'Spiked byzantine chainmaille collar',
+      kind: 'Necklaces', mood: 'Feral' },
+
+    { name: 'Dagger Drops', price: '£120', d: 'Lattice cross with one long spike.',
+      src: 'assets/daggers.png', fit: 'contain', alt: 'Chainmaille cross earrings with spike drops',
+      kind: 'Earrings', mood: 'Sharp' },
+
+    { name: 'Sanguine', price: '£145', d: 'Chandelier weave, red glass drops.',
+      src: 'assets/sanguine.png', fit: 'contain', alt: 'Chainmaille chandelier earrings with red glass',
+      kind: 'Earrings', mood: 'Soft' },
+
+    { name: 'Sweetpea', price: '£95', d: 'Rosette weave, lobster clasp.',
+      src: 'assets/bracelet-o.png', fit: 'contain', alt: 'Rosette weave chainmaille bracelet',
+      kind: 'Bracelets', mood: 'Soft' },
+
+    { name: 'Nocturne', price: '£110', d: 'Spiral hoops, amethyst and jet.',
+      src: 'assets/spiral3.png', fit: 'cover', alt: 'Spiral wire earrings with amethyst and jet beads',
+      kind: 'Earrings', mood: 'Soft' }
+
+    // next piece goes here, comma above ↑
+  ];
+  CREED = [
+    { t: 'Not cast.', col: '#050606' },
+    { t: 'Not stamped.', col: '#343534' },
+    { t: 'Not made twice.', col: '#666B70' }
+  ];
+  // continuous zoom path across two earrings
+  ZOOM = [
+    { s: 1, tx: 0, ty: 0, bg: '#050606', n: '01', t: 'A pair, not a mirror', d: 'Two earrings built one after the other. They match in weight and length, never in every link — a mirrored pair would mean a mould.' },
+    { s: 2.7, tx: 15, ty: -20, bg: '#343534', n: '02', t: 'The spike', d: 'Turned and polished on its own, then hung from a closed ring so the point falls away from the jaw.' },
+    { s: 2.2, tx: 17, ty: 8, bg: '#666B70', n: '03', t: 'The lattice', d: '1.2 mm surgical stainless, saw-cut so both ends meet flat. Closed by hand until a fingernail finds no gap.' },
+    { s: 2.4, tx: -16, ty: -14, bg: '#343534', n: '04', t: 'The glass', d: 'Czech glass drops, drilled and strung on the same wire as the weave. No glue anywhere in the piece.' },
+    { s: 2.9, tx: -18, ty: 18, bg: '#71808C', n: '05', t: 'The finding', d: 'Surgical steel hooks as standard. Lever-backs, posts or clip-ons swapped in at no charge.' },
+    { s: 1, tx: 0, ty: 0, bg: '#050606', n: '06', t: 'Then it goes in the post', d: 'Boxed with a spare ring or two, and a note on how to wash it. Free repair and resize for as long as you wear it.' }
+  ];
+  FACTS = [
+    { k: 'Metal', v: 'Surgical stainless and silver-tone alloy, chosen so it will not green your skin.' },
+    { k: 'Run', v: 'Nothing held in stock. Each order is built from bare rings after you place it.' },
+    { k: 'After', v: 'Free repair and resize for as long as you wear it.' }
+  ];
+  KINDS = [
+    { v: 'Necklace', d: 'Collar or choker' },
+    { v: 'Earrings', d: 'Drops or hoops' },
+    { v: 'Bracelet', d: 'Wrist or hand chain' },
+    { v: 'A set', d: 'Two or more' }
+  ];
+  MOODS = [
+    { v: 'Soft', d: 'Weave, beads, glass' },
+    { v: 'Sharp', d: 'A spike or two' },
+    { v: 'Feral', d: 'Spiked throughout' }
+  ];
+  FITS = {
+    Necklace: { t: 'How close to the throat?', o: ['36 cm', '40 cm', '45 cm', 'Not sure'], h: 'Not sure is fine — a paper gauge is posted to you before work starts.' },
+    Necklaces: { t: 'How close to the throat?', o: ['36 cm', '40 cm', '45 cm', 'Not sure'], h: 'Not sure is fine — a paper gauge is posted to you before work starts.' },
+    Earrings: { t: 'How long a drop?', o: ['4 cm', '7 cm', '11 cm', 'Not sure'], h: 'Hooks as standard. Lever-backs or clip-ons on request, no charge.' },
+    Bracelet: { t: 'What wrist?', o: ['15 cm', '17 cm', '19 cm', 'Not sure'], h: 'Measure loosely with a strip of paper, or leave it to her.' },
+    Bracelets: { t: 'What wrist?', o: ['15 cm', '17 cm', '19 cm', 'Not sure'], h: 'Measure loosely with a strip of paper, or leave it to her.' },
+    'A set': { t: 'Roughly what size?', o: ['Petite', 'Standard', 'Generous', 'Not sure'], h: 'Each piece in the set is confirmed with you before starting.' }
+  };
+  BASE = { Necklace: 300, Earrings: 130, Bracelet: 110, 'A set': 380 };
+  MOODM = { Soft: 1, Sharp: 1.2, Feral: 1.5 };
+  RINGS = (function () {
+    const g = [
+      'conic-gradient(from 20deg,#F3F3F4,#666B70,#F3F3F4,#343534,#B6B8B8,#71808C,#F3F3F4)',
+      'conic-gradient(from 140deg,#B6B8B8,#F3F3F4,#343534,#71808C,#F3F3F4,#666B70,#B6B8B8)',
+      'conic-gradient(from 260deg,#F3F3F4,#71808C,#B6B8B8,#050606,#F3F3F4,#343534,#F3F3F4)'
+    ];
+    const out = [];
+    for (let i = 0; i < 14; i++) {
+      const px = 78 + (i % 5) * 46;
+      out.push({ d: (i * 360) / 14 + (i % 3) * 11, s: px + 'px', m: '-' + (px / 2) + 'px', b: (i % 3 === 0 ? 9 : i % 3 === 1 ? 6 : 4) + 'px', g: g[i % 3] });
+    }
+    return out;
+  })();
+
+  flow() { return this.state.mode === 'order' ? ['which', 'fit', 'contact'] : ['piece', 'mood', 'fit', 'contact']; }
+  key() { return this.flow()[this.state.step]; }
+  kind() {
+    const o = this.state.o;
+    if (this.state.mode === 'commission') return o.piece;
+    const h = this.ALL.find((x) => x.name === o.house);
+    return h ? h.kind : '';
+  }
+  reduce() { return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+  list() {
+    const st = this.state;
+    const q = (st.q || '').trim().toLowerCase();
+    return this.ALL.filter((p) => {
+      if (st.cat !== 'All' && p.kind !== st.cat) return false;
+      if (st.edge !== 'Any' && p.mood !== st.edge) return false;
+      if (!q) return true;
+      return (p.name + ' ' + p.kind + ' ' + p.mood + ' ' + p.d).toLowerCase().indexOf(q) > -1;
+    });
+  }
+  safeCur() { const n = this.list().length; return n ? Math.min(this.state.cur, n - 1) : 0; }
+
+  componentDidMount() { this.schedule(); }
+
+  schedule(tries) {
+    const t = tries || 0;
+    clearTimeout(this._sched);
+    this._sched = setTimeout(() => {
+      const v = this.state.view;
+      const need = v === 'shop' ? '[data-search]' : v === 'home' ? '[data-zoomsec]' : null;
+      if (need && !document.querySelector(need) && t < 30) { this.schedule(t + 1); return; }
+      this.wire();
+    }, t ? 32 : 0);
+  }
+
+  componentDidUpdate(pp, ps) {
+    if (ps.view !== this.state.view) { window.scrollTo({ top: 0, behavior: 'auto' }); this.curtain(); this.schedule(); }
+    else if (ps.cat !== this.state.cat) { this.rail(); }
+    else if (ps.cur !== this.state.cur || ps.q !== this.state.q || ps.edge !== this.state.edge) { this.rail(); }
+    else if (ps.step !== this.state.step) { this.pop('[data-step]'); }
+  }
+  componentWillUnmount() { clearTimeout(this._sched); if (this._off) this._off(); if (this._offDrag) this._offDrag(); }
+
+  curtain() {
+    if (this.reduce()) return;
+    const rs = [].slice.call(document.querySelectorAll('[data-cring]'));
+    const veil = document.querySelector('[data-cveil]');
+    if (!rs.length) return;
+    const w = window.innerWidth, h = window.innerHeight;
+    const hyp = Math.sqrt(w * w + h * h);
+    if (veil) {
+      veil.style.transition = 'none';
+      veil.style.opacity = '1';
+      requestAnimationFrame(() => { veil.style.transition = 'opacity .8s ease .18s'; veil.style.opacity = '0'; });
+    }
+    rs.forEach((r, i) => {
+      const a = (parseFloat(r.dataset.d) || 0) * Math.PI / 180;
+      const far = hyp * (0.62 + (i % 4) * 0.14);
+      const dx = Math.cos(a) * far, dy = Math.sin(a) * far;
+      const spin = (i % 2 ? 1 : -1) * (200 + i * 28);
+      const dly = 30 + i * 34;
+      r.style.transition = 'none';
+      r.style.opacity = '0';
+      r.style.transform = 'translate3d(0,0,-620px) rotateX(64deg) rotate(0deg) scale(.16)';
+      requestAnimationFrame(() => {
+        r.style.transition = 'transform 1.15s ' + E + ' ' + dly + 'ms, opacity .34s ease ' + dly + 'ms';
+        r.style.opacity = '1';
+        r.style.transform = 'translate3d(' + (dx * 0.26).toFixed(0) + 'px,' + (dy * 0.26).toFixed(0) + 'px,60px) rotateX(24deg) rotate(' + (spin * 0.35).toFixed(0) + 'deg) scale(1)';
+        setTimeout(() => {
+          r.style.transition = 'transform 1.05s cubic-bezier(.62,0,.9,.34), opacity .55s ease .5s';
+          r.style.opacity = '0';
+          r.style.transform = 'translate3d(' + dx.toFixed(0) + 'px,' + dy.toFixed(0) + 'px,780px) rotateX(6deg) rotate(' + spin.toFixed(0) + 'deg) scale(2.3)';
+        }, dly + 460);
+      });
+    });
+  }
+
+  pop(sel) {
+    if (this.reduce()) return;
+    document.querySelectorAll(sel).forEach((el, i) => {
+      el.style.transition = 'none';
+      el.style.opacity = '0';
+      el.style.transform = 'perspective(900px) rotateX(6deg) translate3d(0,16px,-30px)';
+      requestAnimationFrame(() => {
+        el.style.transition = 'transform .9s ' + E + ' ' + (i * 50) + 'ms, opacity .7s ease ' + (i * 50) + 'ms';
+        el.style.opacity = '1'; el.style.transform = 'none';
+      });
+    });
+  }
+
+  rail() {
+    const img = document.querySelector('[data-cur-img]');
+    if (!img) return;
+    const p = this.list()[this.safeCur()];
+    if (!p) return;
+    if (img.getAttribute('src') !== p.src) {
+      img.setAttribute('src', p.src);
+      img.setAttribute('alt', p.alt);
+    }
+    img.style.objectFit = p.fit;
+    if (this.reduce()) return;
+    img.style.animation = 'none';
+    void img.offsetWidth;
+    img.style.animation = 'hos-swap .75s ' + E + ' both';
+  }
+
+  dragWire() {
+    if (this._offDrag) this._offDrag();
+    const onKey = (e) => {
+      if (this.state.view !== 'shop') return;
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA')) return;
+      const n = this.list().length;
+      if (!n) return;
+      const step = (d) => { e.preventDefault(); this.setState((st) => ({ cur: (this.safeCur() + d + n) % n })); };
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') step(1);
+      else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') step(-1);
+    };
+    window.addEventListener('keydown', onKey);
+    this._offDrag = () => window.removeEventListener('keydown', onKey);
+  }
+
+  replayHome() {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    this.curtain();
+    this.schedule();
+  }
+
+  paintZoom(i) {
+    const z = this.ZOOM[i];
+    if (!z) return;
+    const q = (s) => document.querySelector(s);
+    const stage = q('[data-zstage]');
+    if (stage) stage.style.background = z.bg;
+    const cap = q('[data-zcap]');
+    const write = () => {
+      const n = q('[data-zn]'), t = q('[data-zt]'), d = q('[data-zd]');
+      if (n) n.textContent = z.n;
+      if (t) t.textContent = z.t;
+      if (d) d.textContent = z.d;
+    };
+    if (cap && !this.reduce()) {
+      cap.style.transition = 'opacity .35s ease, transform .35s ease';
+      cap.style.opacity = '0';
+      cap.style.transform = 'translate3d(0,10px,0)';
+      clearTimeout(this._capT);
+      this._capT = setTimeout(() => {
+        write();
+        cap.style.transition = 'opacity .7s ease, transform .9s ' + E;
+        cap.style.opacity = '1';
+        cap.style.transform = 'none';
+      }, 360);
+    } else write();
+    document.querySelectorAll('[data-zdot]').forEach((d, n) => {
+      d.style.background = n === i ? '#F3F3F4' : 'rgba(182,184,184,.3)';
+    });
+  }
+
+  // CSS makes everything visible at mount; below-fold items park at a 0.01ms animation
+  // and replay in full once scrolled to. Rebuilt from the live DOM whenever it goes stale.
+  stage() {
+    this._stage = [];
+    if (this.reduce() || CSS.supports('animation-timeline: view()')) return;
+    const vh0 = window.innerHeight;
+    document.querySelectorAll('[data-reveal],[data-line]').forEach((el) => {
+      if (el.getBoundingClientRect().top < vh0 * 0.9) {
+        if (el.hasAttribute('data-line')) el.classList.add('hos-play');
+        return;
+      }
+      if (!el.hasAttribute('data-line')) el.classList.add('hos-wait');
+      this._stage.push(el);
+    });
+  }
+
+  wire() {
+    if (this._off) this._off();
+    const reduce = this.reduce();
+
+    this._q = {};
+    this.stage();
+    if (!reduce) {
+      document.querySelectorAll('[data-tier]').forEach((el) => {
+        el.addEventListener('pointermove', (ev) => {
+          const r = el.getBoundingClientRect();
+          const x = ((ev.clientX - r.left) / r.width - 0.5) * 7;
+          const y = -((ev.clientY - r.top) / r.height - 0.5) * 5;
+          el.style.transform = 'perspective(1200px) rotateY(' + x + 'deg) rotateX(' + y + 'deg)';
+        });
+        el.addEventListener('pointerleave', () => {
+          el.style.transition = 'transform 1s ' + E;
+          el.style.transform = 'none';
+          setTimeout(() => { el.style.transition = ''; }, 1000);
+        });
+      });
+    }
+
+    document.querySelectorAll('img[data-src]').forEach((im) => {
+      const want = im.getAttribute('data-src');
+      if (want && want.indexOf('{{') === -1 && im.getAttribute('src') !== want) im.setAttribute('src', want);
+    });
+    this.rail();
+    this.dragWire();
+    this._zi = -1;
+    this.paintZoom(0);
+
+    let ticking = 0;
+    const q = (sel) => {
+      const c = this._q || (this._q = {});
+      let el = c[sel];
+      if (!el || !el.isConnected) { el = document.querySelector(sel); c[sel] = el; }
+      return el;
+    };
+
+    const onScroll = () => {
+      const now = Date.now();
+      if (ticking && now - ticking < 200) return;
+      ticking = now;
+      requestAnimationFrame(() => {
+        ticking = 0;
+        const y = window.scrollY, vh = window.innerHeight;
+        const max = document.documentElement.scrollHeight - vh;
+        const bar = q('[data-progress]'), nav = q('[data-nav]');
+        if (bar) bar.style.transform = 'scaleX(' + Math.min(1, max > 0 ? y / max : 0) + ')';
+        if (nav) {
+          const on = y > 26;
+          nav.style.background = on ? 'rgba(5,6,6,.86)' : 'transparent';
+          nav.style.borderColor = on ? '#343534' : 'transparent';
+          nav.style.backdropFilter = on ? 'blur(16px)' : 'none';
+        }
+        if (!this._stage || !this._stage.length || !this._stage[0].isConnected) this.stage();
+        if (this._stage && this._stage.length) {
+          this._stage = this._stage.filter((el) => {
+            if (!el.isConnected) return false;
+            const r = el.getBoundingClientRect();
+            if (r.top > vh * 0.86 || r.bottom < 0) return true;
+            el.classList.remove('hos-wait');
+            if (el.hasAttribute('data-line')) { el.classList.add('hos-play'); }
+            else { el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; }
+            return false;
+          });
+        }
+        if (reduce) return;
+        const oSlot = q('[data-o]'), zsec = q('[data-zoomsec]'), zframe = q('[data-zframe]');
+        if (oSlot && y < vh * 1.3) oSlot.style.transform = 'rotate(' + (y * 0.12).toFixed(1) + 'deg) translate3d(0,' + (y * 0.04).toFixed(1) + 'px,0)';
+
+        if (zsec && zframe) {
+          const r = zsec.getBoundingClientRect();
+          const span = r.height - vh;
+          const p = span > 0 ? Math.max(0, Math.min(1, -r.top / span)) : 0;
+          const segs = this.ZOOM.length - 1;
+          const raw = p * segs;
+          const i0 = Math.max(0, Math.min(segs, Math.floor(raw)));
+          const i1 = Math.min(segs, i0 + 1);
+          let f = raw - i0;
+          f = f * f * (3 - 2 * f);
+          const a = this.ZOOM[i0], b = this.ZOOM[i1];
+          const s = a.s + (b.s - a.s) * f;
+          const tx = a.tx + (b.tx - a.tx) * f;
+          const ty = a.ty + (b.ty - a.ty) * f;
+          zframe.style.transform = 'scale(' + s.toFixed(3) + ') translate(' + tx.toFixed(2) + '%,' + ty.toFixed(2) + '%)';
+          const idx = Math.round(raw);
+          if (idx !== this._zi) { this._zi = idx; this.paintZoom(idx); }
+        }
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    this._off = () => window.removeEventListener('scroll', onScroll);
+  }
+
+  set(p) { this.setState((s) => ({ o: Object.assign({}, s.o, p) })); }
+
+  onGo = (e) => {
+    const v = e.currentTarget.dataset.go;
+    if (v === 'home') { this.setState((st) => ({ view: 'home', visit: (st.visit || 0) + 1 })); return; }
+    if (v === 'commission') this.setState({ view: 'form', mode: 'commission', step: 0, sent: false, o: { house: '', piece: '', mood: '', fit: '', name: '', email: '' } });
+    else if (v === this.state.view) this.replayHome();
+    else this.setState({ view: v });
+  };
+  onThumb = (e) => this.setState({ cur: +e.currentTarget.dataset.i });
+  onCat = (e) => {
+    const v = e.currentTarget.dataset.cat;
+    this.setState((st) => ({ cat: st.cat === v && v !== 'All' ? 'All' : v, cur: 0 }));
+  };
+  onMood = (e) => {
+    const v = e.currentTarget.dataset.mood;
+    this.setState((st) => ({ edge: st.edge === v && v !== 'Any' ? 'Any' : v, cur: 0 }));
+  };
+  onSearch = (e) => this.setState({ q: e.currentTarget.value, cur: 0 });
+  onClearFilters = () => this.setState({ cat: 'All', edge: 'Any', q: '', cur: 0 });
+  onSlide = (e) => {
+    const i = +e.currentTarget.dataset.i;
+    if (i === this.state.cur) this.startOrder(this.list()[i].name);
+    else this.setState({ cur: i });
+  };
+  onNudge = (e) => {
+    const n = this.list().length;
+    const d = +e.currentTarget.dataset.nudge;
+    this.setState((s) => ({ cur: (s.cur + d + n) % n }));
+  };
+  onRailOrder = () => { const p = this.list()[this.safeCur()]; if (p) this.startOrder(p.name); };
+
+  startOrder(name) {
+    const h = this.ALL.find((x) => x.name === name);
+    if (!h) return;
+    this.setState({ view: 'form', mode: 'order', step: 1, sent: false, o: { house: h.name, piece: '', mood: h.mood, fit: '', name: '', email: '' } });
+  }
+
+  onPick = (e) => {
+    const d = e.currentTarget.dataset;
+    if (d.f === 'piece' || d.f === 'house') this.set({ [d.f]: d.v, fit: '' });
+    else this.set({ [d.f]: d.v });
+  };
+  onField = (e) => this.set({ [e.currentTarget.dataset.f]: e.currentTarget.value });
+  onBack = () => this.setState((s) => ({ step: Math.max(0, s.step - 1) }));
+  onNext = () => {
+    if (!this.valid()) return;
+    if (this.state.step >= this.flow().length - 1) this.setState({ sent: true });
+    else this.setState((s) => ({ step: s.step + 1 }));
+  };
+  onReset = () => this.setState({ step: 0, sent: false, o: { house: '', piece: '', mood: '', fit: '', name: '', email: '' } });
+
+  valid() {
+    const o = this.state.o, k = this.key();
+    if (k === 'which') return !!o.house;
+    if (k === 'piece') return !!o.piece;
+    if (k === 'mood') return !!o.mood;
+    if (k === 'fit') return !!o.fit;
+    return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(o.email) && o.name.trim().length > 1;
+  }
+  gap() {
+    const o = this.state.o, k = this.key();
+    if (k === 'which' || k === 'piece' || k === 'mood') return 'Pick one';
+    if (k === 'fit') return 'Pick a size';
+    if (!o.name.trim()) return 'Add your name';
+    return 'Add a valid email';
+  }
+  money() {
+    const o = this.state.o;
+    if (this.state.mode === 'order') {
+      const h = this.ALL.find((x) => x.name === o.house);
+      return h ? h.price : '—';
+    }
+    if (!o.piece) return '—';
+    const n = this.BASE[o.piece] * (this.MOODM[o.mood] || 1);
+    return '£' + (Math.round(n * 0.9 / 5) * 5) + ' — £' + (Math.round(n * 1.15 / 5) * 5);
+  }
+  readyBy() {
+    const d = new Date(); d.setDate(d.getDate() + 30);
+    return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  }
+
+  stepData() {
+    const o = this.state.o, k = this.key();
+    const fit = this.FITS[this.kind()] || this.FITS['A set'];
+    if (k === 'which') return {
+      t: 'Which one?', h: 'Each is built from bare rings after you order.',
+      c: this.ALL.map((p) => ({ f: 'house', v: p.name, d: p.price, src: p.src, hasImg: true, hasD: true, sel: o.house === p.name, w: '150px', h: '64px' }))
+    };
+    if (k === 'piece') return {
+      t: 'What are we making?', h: 'Anything not on this list — pick the closest and say more by email.',
+      c: this.KINDS.map((p) => ({ f: 'piece', v: p.v, d: p.d, hasImg: false, hasD: true, sel: o.piece === p.v, w: '150px', h: '70px' }))
+    };
+    if (k === 'mood') return {
+      t: 'How sharp?', h: 'This sets the spike count and the weight of the weave.',
+      c: this.MOODS.map((m) => ({ f: 'mood', v: m.v, d: m.d, hasImg: false, hasD: true, sel: o.mood === m.v, w: '150px', h: '70px' }))
+    };
+    if (k === 'fit') return {
+      t: fit.t, h: fit.h,
+      c: fit.o.map((v) => ({ f: 'fit', v: v, d: '', hasImg: false, hasD: false, sel: o.fit === v, w: '106px', h: '54px' }))
+    };
+    return {
+      t: 'Where does it go?',
+      h: this.state.mode === 'order' ? 'Confirmation and a payment link the same day.' : 'A drawing and a fixed price within two working days.',
+      c: []
+    };
+  }
+
+  renderVals() {
+    const s = this.state, o = s.o, k = this.key(), flow = this.flow();
+    const ok = this.valid();
+    const last = s.step >= flow.length - 1;
+    const order = s.mode === 'order';
+    const view = s.view;
+    const sd = this.stepData();
+    const line = (kk, v) => ({ k: kk, v: v || '—', c: v ? '#050606' : '#9AA0A4' });
+    const nOn = (v) => (view === v ? '#F3F3F4' : 'transparent');
+    const nFg = (v) => (view === v ? '#F3F3F4' : '#B6B8B8');
+    const commOn = view === 'form' && !order;
+    const found = this.list();
+    const ci = found.length ? Math.min(s.cur, found.length - 1) : 0;
+    const cur = found[ci];
+
+    return {
+      finish: this.props.finish || 'Mirror',
+      rings: this.RINGS,
+      vHome: view === 'home', vShop: view === 'shop', vForm: view === 'form',
+      nShop: nOn('shop'), nShopFg: nFg('shop'),
+      nComm: commOn ? '#F3F3F4' : 'transparent', nCommFg: commOn ? '#F3F3F4' : '#B6B8B8',
+
+      creed: this.CREED,
+      stages: this.ZOOM,
+      facts: this.FACTS,
+
+      chips: ['All', 'Necklaces', 'Earrings', 'Bracelets'].map((v) => ({
+        v: v, sel: s.cat === v,
+        bg: s.cat === v ? '#F3F3F4' : 'transparent',
+        fg: s.cat === v ? '#050606' : '#B6B8B8',
+        bd: s.cat === v ? '#F3F3F4' : '#666B70'
+      })),
+      q: s.q,
+      results: found.map((p, i) => ({
+        i: i, name: p.name, price: p.price, src: p.src, sel: i === ci,
+        bg: i === ci ? 'rgba(243,243,244,.09)' : 'transparent',
+        bd: i === ci ? '#F3F3F4' : '#343534',
+        fg: i === ci ? '#F3F3F4' : '#B6B8B8'
+      })),
+      hasResults: found.length > 0, noResults: found.length === 0,
+      found: found.length + (found.length === 1 ? ' piece' : ' pieces'),
+      clearFg: (s.cat !== 'All' || s.edge !== 'Any' || s.q) ? '#F3F3F4' : '#8f9296',
+      mchips: ['Any', 'Soft', 'Sharp', 'Feral'].map((v) => ({
+        v: v, sel: s.edge === v,
+        bg: s.edge === v ? '#F3F3F4' : 'transparent',
+        fg: s.edge === v ? '#050606' : '#B6B8B8',
+        bd: s.edge === v ? '#F3F3F4' : '#666B70'
+      })),
+      curName: cur ? cur.name : '', curDesc: cur ? cur.d : '', curPrice: cur ? cur.price : '',
+      curKind: cur ? cur.kind : '', curMood: cur ? cur.mood : '',
+
+      title: order ? 'Your order' : 'Commission',
+      subtitle: order ? 'Three steps' : 'Four steps',
+      backTo: order ? 'shop' : 'home',
+      backLabel: order ? 'Shop' : 'Home',
+
+      open: !s.sent, sent: s.sent,
+      isChoice: !s.sent && k !== 'contact',
+      isContact: !s.sent && k === 'contact',
+      stepTitle: sd.t, stepHelp: sd.h, choices: sd.c,
+
+      stepLabel: 'Step ' + (s.step + 1) + ' of ' + flow.length,
+      bars: flow.map((_, i) => ({ c: i <= s.step ? '#050606' : '#B6B8B8' })),
+
+      name: o.name, email: o.email,
+      sentNote: order
+        ? 'Confirmation for ' + (o.house || 'your piece') + ' is on its way to ' + o.email + '.'
+        : 'A drawing and a fixed price reach ' + o.email + ' within two working days.',
+
+      slip: [
+        line('Route', order ? 'From the shop' : 'Commission'),
+        line('Piece', o.house || o.piece),
+        line('Edge', o.mood),
+        line('Size', o.fit),
+        line('Name', o.name)
+      ],
+      ref: 'HOS·26·0447',
+      totalLabel: order ? 'Total' : 'Estimate',
+      estimate: this.money(),
+      ready: this.readyBy(),
+
+      hint: ok ? '' : this.gap(),
+      nextLabel: last ? (order ? 'Place order' : 'Send') : 'Next',
+      nextBg: ok ? '#050606' : 'transparent',
+      nextFg: ok ? '#F3F3F4' : '#666B70',
+      backColor: s.step === 0 ? '#B6B8B8' : '#050606',
+
+      onGo: this.onGo, onCat: this.onCat, onMood: this.onMood, onSearch: this.onSearch,
+      onClearFilters: this.onClearFilters, onThumb: this.onThumb,
+      onRailOrder: this.onRailOrder,
+      onPick: this.onPick, onField: this.onField, onBack: this.onBack,
+      onNext: this.onNext, onReset: this.onReset
+    };
+  }
+}
+
+</script>
+</body>
+</html>
