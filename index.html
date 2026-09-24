@@ -49,7 +49,6 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid 
 @keyframes hos-sheen { 0%,62% { background-position: 160% 0; } 100% { background-position: -60% 0; } }
 @keyframes hos-shine { 0%,70% { background-position: 150% 0; } 100% { background-position: -50% 0; } }
 @keyframes hos-twinkle { 0%,82%,100% { opacity: 0; transform: scale(0) rotate(0deg); } 88% { opacity: 1; transform: scale(1) rotate(45deg); } 94% { opacity: .5; transform: scale(.5) rotate(90deg); } }
-@keyframes hos-glint { from { transform: translate3d(-120%,0,0) skewX(-18deg); opacity: 1; } to { transform: translate3d(220%,0,0) skewX(-18deg); opacity: 0; } }
 [data-charm] { animation: hos-charm 2.1s cubic-bezier(.16,1,.3,1) .05s both; transform-style: preserve-3d; }
 [data-close="l"] { animation: hos-close-l 1.5s cubic-bezier(.16,1,.3,1) .7s both; }
 [data-close="r"] { animation: hos-close-r 1.5s cubic-bezier(.16,1,.3,1) .7s both; }
@@ -57,7 +56,9 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid 
 [data-sheen] { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 38%, rgba(255,255,255,.75) 48%, rgba(255,255,255,.95) 50%, rgba(255,255,255,.75) 52%, transparent 62%); background-size: 300% 100%; background-position: 160% 0; mix-blend-mode: overlay; -webkit-mask: url('assets/pendant-o.png') center / contain no-repeat; mask: url('assets/pendant-o.png') center / contain no-repeat; animation: hos-sheen 5.5s cubic-bezier(.45,0,.25,1) 1.9s infinite; }
 [data-spark] { position: absolute; width: 22%; aspect-ratio: 1; pointer-events: none; background: radial-gradient(closest-side, #fff, rgba(255,255,255,0) 70%); clip-path: polygon(50% 0,56% 44%,100% 50%,56% 56%,50% 100%,44% 56%,0 50%,44% 44%); opacity: 0; animation: hos-twinkle 5.5s ease-out infinite; }
 [data-glint] { display: inline-block; padding: 0 .08em; margin: 0 -.08em; background: linear-gradient(100deg, currentColor 42%, rgba(243,243,244,.95) 50%, currentColor 58%); background-size: 300% 100%; background-position: 150% 0; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; animation: hos-shine 8s ease-in-out infinite; }
-[data-zglint] { position: absolute; top: -10%; bottom: -10%; left: 0; width: 38%; pointer-events: none; background: linear-gradient(90deg, rgba(243,243,244,0), rgba(243,243,244,.13) 45%, rgba(255,255,255,.28) 50%, rgba(243,243,244,.13) 55%, rgba(243,243,244,0)); opacity: 0; }
+@keyframes hos-marquee { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
+[data-rimg] { transition: transform .9s cubic-bezier(.16,1,.3,1), filter .9s ease; transform-origin: 50% 0; }
+[data-rframe]:hover [data-rimg] { filter: brightness(1.25) !important; }
 @media (prefers-reduced-motion: reduce) { [data-charm],[data-close],[data-silver],[data-sheen],[data-spark],[data-glint] { animation: none !important; } [data-spark],[data-sheen] { display: none; } }
 @media (prefers-reduced-motion: reduce) { [data-anim] { animation: none !important; } }
 </style>
@@ -67,13 +68,6 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid 
 
   <div style="position: fixed; top: 0; left: 0; right: 0; height: 1px; z-index: 96; background: rgba(102,107,112,.3);">
     <div data-progress="" style="height: 100%; width: 100%; background: linear-gradient(90deg,#666B70,#F3F3F4,#71808C); transform: scaleX(0); transform-origin: 0 50%;"></div>
-  </div>
-
-  <div data-curtain="" style="position: fixed; inset: 0; z-index: 95; overflow: hidden; pointer-events: none; perspective: 1100px;">
-    <span data-cveil="" style="position: absolute; inset: 0; background: radial-gradient(60% 60% at 50% 50%, rgba(5,6,6,.72), rgba(5,6,6,.9)); opacity: 0;"></span>
-    <sc-for list="{{ rings }}" as="r">
-      <span data-cring="" data-d="{{ r.d }}" style="position: absolute; left: 50%; top: 50%; width: {{ r.s }}; height: {{ r.s }}; margin: {{ r.m }} 0 0 {{ r.m }}; border-radius: 50%; background: {{ r.g }}; -webkit-mask: radial-gradient(closest-side, transparent calc(100% - {{ r.b }}), #000 calc(100% - {{ r.b }})); mask: radial-gradient(closest-side, transparent calc(100% - {{ r.b }}), #000 calc(100% - {{ r.b }})); opacity: 0; will-change: transform, opacity;"></span>
-    </sc-for>
   </div>
 
   <nav data-nav="" style="position: fixed; top: 1px; left: 0; right: 0; z-index: 90; height: 78px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 0 clamp(18px,4vw,60px); border-bottom: 1px solid transparent; transition: background .6s ease, border-color .6s ease;">
@@ -132,34 +126,55 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid 
         </div>
       </section>
 
-      <!-- III · CONTINUOUS ZOOM -->
-      <section data-zoomsec="" style="position: relative; height: 560vh;">
-        <div data-zstage="" style="position: sticky; top: 0; height: 100vh; overflow: hidden; background: #050606; transition: background 1.4s cubic-bezier(.16,1,.3,1);">
-
-          <div data-zframe="" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4%; padding: 8vh 6vw; will-change: transform;">
-            <span data-zp="l" style="flex: 1 1 0; max-width: 42%; height: 74%; display: block;">
-              <img src="assets/daggers.png" alt="Chainmaille cross earrings with spike drops" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
-            </span>
-            <span data-zp="r" style="flex: 1 1 0; max-width: 42%; height: 74%; display: block;">
-              <img src="assets/sanguine.png" alt="Chainmaille chandelier earrings with red glass drops" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
-            </span>
+      <!-- III · THE COLLECTION, scrolled sideways -->
+      <section data-reel="" style="position: relative; height: 420vh;">
+        <div style="position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; background: radial-gradient(80% 70% at 50% 58%, #111313, #050606 72%);">
+          <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 100px clamp(18px,4vw,60px) 0;">
+            <h2 style="margin: 0; font-family: 'Canterbury','Bodoni Moda',serif; font-weight: 400; font-size: clamp(30px,4.4vw,72px); line-height: 1; color: #F3F3F4;"><span data-silver="">The collection</span></h2>
+            <span data-rcount="" style="padding-bottom: 8px; font-size: 10px; letter-spacing: .34em; color: #B6B8B8;">&nbsp;</span>
           </div>
-          <span data-zglint=""></span>
 
-          <div style="position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: clamp(16px,2.4vw,40px); padding: clamp(24px,3vw,44px) clamp(18px,4vw,60px);">
-            <div data-zcap="" style="flex: 1 1 300px; max-width: 46ch; will-change: transform, opacity;">
-              <span data-zn="" style="display: block; font-size: 10px; font-weight: 400; letter-spacing: .34em; text-transform: uppercase; color: #B6B8B8;">01</span>
-              <span data-zt="" style="display: block; margin-top: 12px; font-family: 'BlackChancery','Bodoni Moda',serif; font-weight: 400; font-size: clamp(24px,3.2vw,50px); line-height: 1.04; color: #F3F3F4;">&nbsp;</span>
-              <span data-zd="" style="display: block; margin-top: 14px; font-size: 14px; line-height: 1.7; color: #B6B8B8; text-wrap: pretty;">&nbsp;</span>
-            </div>
-            <div style="display: flex; flex: none; gap: 5px;">
-              <sc-for list="{{ stages }}" as="s">
-                <span data-zdot="" style="display: block; width: 24px; height: 2px; background: rgba(182,184,184,.3); transition: background .7s cubic-bezier(.16,1,.3,1);"></span>
+          <div style="flex: 1; min-height: 0; display: flex; align-items: center;">
+            <div data-rtrack="" style="display: flex; align-items: stretch; gap: clamp(18px,3vw,48px); height: min(62vh,620px); padding: 0 calc(50vw - clamp(120px,16vw,230px)); will-change: transform; transition: transform .7s cubic-bezier(.16,1,.3,1);">
+              <sc-for list="{{ reel }}" as="p" hint-placeholder-count="5">
+                <div data-rpanel="" style="flex: none; width: clamp(240px,32vw,460px); height: 100%; display: flex; flex-direction: column; gap: 16px;">
+                  <button type="button" data-rframe="" data-i="{{ p.i }}" onClick="{{ onReelPick }}" aria-label="{{ p.aria }}" style="position: relative; flex: 1; min-height: 0; padding: 0; border: 1px solid #1c1e1f; background: radial-gradient(62% 56% at 50% 42%, #202324, #090a0a 82%); overflow: hidden; cursor: pointer;">
+                    <img data-rimg="" src="{{ p.src }}" alt="{{ p.alt }}" style="width: 100%; height: 100%; object-fit: {{ p.fit }}; padding: {{ p.pad }}; display: block;" />
+                  </button>
+                  <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;">
+                    <div style="min-width: 0;">
+                      <span style="display: block; font-size: 9.5px; letter-spacing: .3em; text-transform: uppercase; color: #666B70;">{{ p.n }} · {{ p.kind }}</span>
+                      <span style="display: block; margin-top: 9px; font-family: 'Brotheric','Bodoni Moda',serif; font-weight: 400; font-size: clamp(22px,2.2vw,32px); line-height: 1; color: #F3F3F4;">{{ p.name }}</span>
+                      <span style="display: block; margin-top: 8px; font-size: 13px; line-height: 1.55; color: #B6B8B8; text-wrap: pretty;">{{ p.d }}</span>
+                    </div>
+                    <span style="flex: none; padding-top: 18px; font-size: 17px; letter-spacing: .02em; color: #E1E2E2;">{{ p.price }}</span>
+                  </div>
+                </div>
               </sc-for>
+              <div data-rpanel="" style="flex: none; width: clamp(240px,28vw,400px); height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 20px; padding: clamp(24px,3vw,44px); border: 1px solid #343534;">
+                <span style="font-family: 'BlackChancery','Bodoni Moda',serif; font-size: clamp(26px,2.8vw,42px); line-height: 1.06; color: #F3F3F4;">Not here yet?</span>
+                <span style="max-width: 28ch; font-size: 14px; line-height: 1.7; color: #B6B8B8; text-wrap: pretty;">Every piece here started as someone's idea. Bring yours and she'll draw it up.</span>
+                <button type="button" data-go="commission" onClick="{{ onGo }}" style="height: 50px; padding: 0 30px; background: #F3F3F4; color: #050606; border: 0; font-size: 10px; font-weight: 500; letter-spacing: .3em; text-transform: uppercase; cursor: pointer; transition: background .5s;" style-hover="background:#B6B8B8">Commission</button>
+              </div>
             </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 18px; padding: 0 clamp(18px,4vw,60px) clamp(22px,3.4vh,40px);">
+            <div style="flex: 1; height: 1px; background: rgba(102,107,112,.35);">
+              <div data-rbar="" style="height: 100%; background: linear-gradient(90deg,#666B70,#F3F3F4); transform: scaleX(0); transform-origin: 0 50%;"></div>
+            </div>
+            <button type="button" data-go="shop" onClick="{{ onGo }}" style="flex: none; background: none; border: 0; padding: 0; font-size: 9.5px; letter-spacing: .3em; text-transform: uppercase; color: #B6B8B8; cursor: pointer;" style-hover="color:#F3F3F4">Whole shop →</button>
           </div>
         </div>
       </section>
+
+      <!-- ticker -->
+      <div aria-hidden="true" style="overflow: hidden; padding: clamp(14px,1.6vw,22px) 0; background: #050606; border-top: 1px solid #1c1e1f; border-bottom: 1px solid #1c1e1f;">
+        <div data-anim="" style="display: flex; width: max-content; animation: hos-marquee 46s linear infinite;">
+          <sc-for list="{{ ticker }}" as="t"><span style="flex: none; padding-right: clamp(22px,2.6vw,40px); white-space: nowrap; font-family: 'Bodoni Moda',serif; font-style: italic; font-size: clamp(18px,2vw,30px); color: #B6B8B8;">{{ t.t }}<span style="padding-left: clamp(22px,2.6vw,40px); font-style: normal; font-size: .6em; color: #666B70;">✦</span></span></sc-for>
+          <sc-for list="{{ ticker }}" as="t"><span style="flex: none; padding-right: clamp(22px,2.6vw,40px); white-space: nowrap; font-family: 'Bodoni Moda',serif; font-style: italic; font-size: clamp(18px,2vw,30px); color: #B6B8B8;">{{ t.t }}<span style="padding-left: clamp(22px,2.6vw,40px); font-style: normal; font-size: .6em; color: #666B70;">✦</span></span></sc-for>
+        </div>
+      </div>
 
       <!-- IV · THE MAKER on paper -->
       <section style="position: relative; overflow: hidden; background: #F3F3F4; color: #050606; padding: clamp(56px,6.6vw,104px) clamp(18px,4vw,60px);">
@@ -475,14 +490,9 @@ class Component extends DCLogic {
     { t: 'Not stamped.', col: '#343534', dl: '1.8s' },
     { t: 'Not made twice.', col: '#666B70', dl: '2.4s' }
   ];
-  // continuous zoom path across two earrings
-  ZOOM = [
-    { s: 1, tx: 0, ty: 0, bg: '#050606', n: '01', t: 'A pair, not a mirror', d: 'Two earrings built one after the other. They match in weight and length, never in every link — a mirrored pair would mean a mould.' },
-    { s: 2.7, tx: 15, ty: -20, bg: '#343534', n: '02', t: 'The spike', d: 'Turned and polished on its own, then hung from a closed ring so the point falls away from the jaw.' },
-    { s: 2.2, tx: 17, ty: 8, bg: '#666B70', n: '03', t: 'The lattice', d: '1.2 mm surgical stainless, saw-cut so both ends meet flat. Closed by hand until a fingernail finds no gap.' },
-    { s: 2.4, tx: -16, ty: -14, bg: '#343534', n: '04', t: 'The glass', d: 'Czech glass drops, drilled and strung on the same wire as the weave. No glue anywhere in the piece.' },
-    { s: 2.9, tx: -18, ty: 18, bg: '#71808C', n: '05', t: 'The finding', d: 'Surgical steel hooks as standard. Lever-backs, posts or clip-ons swapped in at no charge.' },
-    { s: 1, tx: 0, ty: 0, bg: '#050606', n: '06', t: 'Then it goes in the post', d: 'Boxed with a spare ring or two, and a note on how to wash it. Free repair and resize for as long as you wear it.' }
+  TICKER = [
+    { t: 'Byzantine' }, { t: 'Rosette' }, { t: 'Lattice' }, { t: 'Chandelier' }, { t: 'Spiral' },
+    { t: 'Made to your size' }, { t: 'Nothing held in stock' }, { t: 'Free repair, for as long as you wear it' }
   ];
   FACTS = [
     { k: 'Metal', v: 'Surgical stainless and silver-tone alloy, chosen so it will not green your skin.' },
@@ -510,19 +520,6 @@ class Component extends DCLogic {
   };
   BASE = { Necklace: 300, Earrings: 130, Bracelet: 110, 'A set': 380 };
   MOODM = { Soft: 1, Sharp: 1.2, Feral: 1.5 };
-  RINGS = (function () {
-    const g = [
-      'conic-gradient(from 20deg,#F3F3F4,#666B70,#F3F3F4,#343534,#B6B8B8,#71808C,#F3F3F4)',
-      'conic-gradient(from 140deg,#B6B8B8,#F3F3F4,#343534,#71808C,#F3F3F4,#666B70,#B6B8B8)',
-      'conic-gradient(from 260deg,#F3F3F4,#71808C,#B6B8B8,#050606,#F3F3F4,#343534,#F3F3F4)'
-    ];
-    const out = [];
-    for (let i = 0; i < 14; i++) {
-      const px = 78 + (i % 5) * 46;
-      out.push({ d: (i * 360) / 14 + (i % 3) * 11, s: px + 'px', m: '-' + (px / 2) + 'px', b: (i % 3 === 0 ? 9 : i % 3 === 1 ? 6 : 4) + 'px', g: g[i % 3] });
-    }
-    return out;
-  })();
 
   flow() { return this.state.mode === 'order' ? ['which', 'fit', 'contact'] : ['piece', 'mood', 'fit', 'contact']; }
   key() { return this.flow()[this.state.step]; }
@@ -552,7 +549,7 @@ class Component extends DCLogic {
     clearTimeout(this._sched);
     this._sched = setTimeout(() => {
       const v = this.state.view;
-      const need = v === 'shop' ? '[data-cur-img]' : v === 'home' ? '[data-zoomsec]' : null;
+      const need = v === 'shop' ? '[data-cur-img]' : v === 'home' ? '[data-reel]' : null;
       if (need && !document.querySelector(need) && t < 30) { this.schedule(t + 1); return; }
       this.wire();
     }, t ? 32 : 0);
@@ -563,40 +560,6 @@ class Component extends DCLogic {
     else if (ps.step !== this.state.step) { this.pop('[data-step]'); }
   }
   componentWillUnmount() { clearTimeout(this._sched); clearTimeout(this._railT); if (this._off) this._off(); if (this._offDrag) this._offDrag(); }
-
-  curtain() {
-    if (this.reduce()) return;
-    const rs = [].slice.call(document.querySelectorAll('[data-cring]'));
-    const veil = document.querySelector('[data-cveil]');
-    if (!rs.length) return;
-    const w = window.innerWidth, h = window.innerHeight;
-    const hyp = Math.sqrt(w * w + h * h);
-    if (veil) {
-      veil.style.transition = 'none';
-      veil.style.opacity = '1';
-      requestAnimationFrame(() => { veil.style.transition = 'opacity .8s ease .18s'; veil.style.opacity = '0'; });
-    }
-    rs.forEach((r, i) => {
-      const a = (parseFloat(r.dataset.d) || 0) * Math.PI / 180;
-      const far = hyp * (0.62 + (i % 4) * 0.14);
-      const dx = Math.cos(a) * far, dy = Math.sin(a) * far;
-      const spin = (i % 2 ? 1 : -1) * (200 + i * 28);
-      const dly = 30 + i * 34;
-      r.style.transition = 'none';
-      r.style.opacity = '0';
-      r.style.transform = 'translate3d(0,0,-620px) rotateX(64deg) rotate(0deg) scale(.16)';
-      requestAnimationFrame(() => {
-        r.style.transition = 'transform 1.15s ' + E + ' ' + dly + 'ms, opacity .34s ease ' + dly + 'ms';
-        r.style.opacity = '1';
-        r.style.transform = 'translate3d(' + (dx * 0.26).toFixed(0) + 'px,' + (dy * 0.26).toFixed(0) + 'px,60px) rotateX(24deg) rotate(' + (spin * 0.35).toFixed(0) + 'deg) scale(1)';
-        setTimeout(() => {
-          r.style.transition = 'transform 1.05s cubic-bezier(.62,0,.9,.34), opacity .55s ease .5s';
-          r.style.opacity = '0';
-          r.style.transform = 'translate3d(' + dx.toFixed(0) + 'px,' + dy.toFixed(0) + 'px,780px) rotateX(6deg) rotate(' + spin.toFixed(0) + 'deg) scale(2.3)';
-        }, dly + 460);
-      });
-    });
-  }
 
   pop(sel) {
     if (this.reduce()) return;
@@ -652,42 +615,6 @@ class Component extends DCLogic {
     this.schedule();
   }
 
-  paintZoom(i) {
-    const z = this.ZOOM[i];
-    if (!z) return;
-    const q = (s) => document.querySelector(s);
-    const stage = q('[data-zstage]');
-    if (stage) stage.style.background = z.bg;
-    const gl = q('[data-zglint]');
-    if (gl && !this.reduce() && this._zi > 0) {
-      gl.style.animation = 'none';
-      void gl.offsetWidth;
-      gl.style.animation = 'hos-glint 1.3s ' + E + ' both';
-    }
-    const cap = q('[data-zcap]');
-    const write = () => {
-      const n = q('[data-zn]'), t = q('[data-zt]'), d = q('[data-zd]');
-      if (n) n.textContent = z.n;
-      if (t) t.textContent = z.t;
-      if (d) d.textContent = z.d;
-    };
-    if (cap && !this.reduce()) {
-      cap.style.transition = 'opacity .35s ease, transform .35s ease';
-      cap.style.opacity = '0';
-      cap.style.transform = 'translate3d(0,10px,0)';
-      clearTimeout(this._capT);
-      this._capT = setTimeout(() => {
-        write();
-        cap.style.transition = 'opacity .7s ease, transform .9s ' + E;
-        cap.style.opacity = '1';
-        cap.style.transform = 'none';
-      }, 360);
-    } else write();
-    document.querySelectorAll('[data-zdot]').forEach((d, n) => {
-      d.style.background = n === i ? '#F3F3F4' : 'rgba(182,184,184,.3)';
-    });
-  }
-
   // CSS makes everything visible at mount; below-fold items park at a 0.01ms animation
   // and replay in full once scrolled to. Rebuilt from the live DOM whenever it goes stale.
   stage() {
@@ -732,8 +659,6 @@ class Component extends DCLogic {
     });
     this.rail();
     this.dragWire();
-    this._zi = -1;
-    this.paintZoom(0);
 
     let ticking = 0;
     const q = (sel) => {
@@ -771,43 +696,52 @@ class Component extends DCLogic {
             return false;
           });
         }
+        const rsec = q('[data-reel]'), track = q('[data-rtrack]');
+        if (rsec && track) {
+          const dist = Math.max(0, track.scrollWidth - window.innerWidth);
+          const want = Math.round(dist + vh);
+          if (Math.abs(rsec.offsetHeight - want) > 2) rsec.style.height = want + 'px';
+          const r = rsec.getBoundingClientRect();
+          const span = r.height - vh;
+          const p = span > 0 ? Math.max(0, Math.min(1, -r.top / span)) : 0;
+          track.style.transform = 'translate3d(' + (-p * dist).toFixed(1) + 'px,0,0)';
+          const rb = q('[data-rbar]');
+          if (rb) rb.style.transform = 'scaleX(' + p.toFixed(4) + ')';
+          // each piece hangs from the top of its frame and swings as it passes centre;
+          // measured from where the track is heading, not where its transition has got to
+          const w = window.innerWidth, n = this.ALL.length;
+          let near = 0, best = 1e9;
+          track.querySelectorAll('[data-rpanel]').forEach((el, i) => {
+            const c = Math.max(-1.2, Math.min(1.2, (el.offsetLeft + el.offsetWidth / 2 - p * dist - w / 2) / w));
+            const a = Math.abs(c);
+            if (i < n && a < best) { best = a; near = i; }
+            const img = el.querySelector('[data-rimg]');
+            if (!img || reduce) return;
+            img.style.transform = 'rotate(' + (img.style.objectFit === 'cover' ? 0 : -c * 9).toFixed(2) + 'deg) scale(' + (1 - Math.min(1, a) * 0.16).toFixed(3) + ')';
+            img.style.filter = 'brightness(' + (1 - Math.min(1, a) * 0.55).toFixed(2) + ')';
+          });
+          const rc = q('[data-rcount]');
+          const pad = (k) => (k < 10 ? '0' : '') + k;
+          if (rc) rc.textContent = pad(near + 1) + ' / ' + pad(n);
+        }
         if (reduce) return;
-        const oSlot = q('[data-o]'), zsec = q('[data-zoomsec]'), zframe = q('[data-zframe]');
+        const oSlot = q('[data-o]');
         if (oSlot && y < vh * 1.3) {
           const sway = Math.sin(y / 90) * 7 * Math.min(1, y / 160);
           oSlot.style.transform = 'translate3d(0,' + (y * 0.06).toFixed(1) + 'px,0) rotateZ(' + sway.toFixed(2) + 'deg) rotateY(' + (y * 0.45).toFixed(1) + 'deg) scale(' + (1 - Math.min(1, y / vh) * 0.12).toFixed(3) + ')';
         }
-
-        if (zsec && zframe) {
-          const r = zsec.getBoundingClientRect();
-          const span = r.height - vh;
-          const p = span > 0 ? Math.max(0, Math.min(1, -r.top / span)) : 0;
-          const segs = this.ZOOM.length - 1;
-          const raw = p * segs;
-          const i0 = Math.max(0, Math.min(segs, Math.floor(raw)));
-          const i1 = Math.min(segs, i0 + 1);
-          let f = raw - i0;
-          f = f * f * (3 - 2 * f);
-          const a = this.ZOOM[i0], b = this.ZOOM[i1];
-          const s = a.s + (b.s - a.s) * f;
-          const tx = a.tx + (b.tx - a.tx) * f;
-          const ty = a.ty + (b.ty - a.ty) * f;
-          zframe.style.transform = 'scale(' + s.toFixed(3) + ') translate(' + tx.toFixed(2) + '%,' + ty.toFixed(2) + '%)';
-          const idx = Math.round(raw);
-          if (idx !== this._zi) { this._zi = idx; this.paintZoom(idx); }
-        }
       });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
     onScroll();
-    this._off = () => window.removeEventListener('scroll', onScroll);
+    this._off = () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); };
   }
 
   set(p) { this.setState((s) => ({ o: Object.assign({}, s.o, p) })); }
 
   onGo = (e) => {
     const v = e.currentTarget.dataset.go;
-    if (v !== this.state.view || v === 'commission') this.curtain();
     if (v === 'home') { this.setState((st) => ({ view: 'home', visit: (st.visit || 0) + 1 })); return; }
     if (v === 'commission') this.setState({ view: 'form', mode: 'commission', step: 0, sent: false, o: { house: '', piece: '', mood: '', fit: '', name: '', email: '' } });
     else if (v === this.state.view) this.replayHome();
@@ -834,6 +768,8 @@ class Component extends DCLogic {
     const d = +e.currentTarget.dataset.nudge;
     this.setState((s) => ({ cur: (s.cur + d + n) % n }));
   };
+  // a piece tapped in the home-page collection opens in the shop, unfiltered
+  onReelPick = (e) => this.setState({ view: 'shop', cat: 'All', edge: 'Any', q: '', cur: +e.currentTarget.dataset.i });
   onRailOrder = () => { const p = this.list()[this.safeCur()]; if (p) this.startOrder(p.name); };
 
   startOrder(name) {
@@ -947,13 +883,16 @@ class Component extends DCLogic {
 
     return {
       finish: this.props.finish || 'Mirror',
-      rings: this.RINGS,
       vHome: view === 'home', vShop: view === 'shop', vForm: view === 'form',
       nShop: nOn('shop'), nShopFg: nFg('shop'),
       nComm: commOn ? '#F3F3F4' : 'transparent', nCommFg: commOn ? '#F3F3F4' : '#B6B8B8',
 
       creed: this.CREED,
-      stages: this.ZOOM,
+      reel: this.ALL.map((p, i) => ({
+        i: i, n: (i < 9 ? '0' : '') + (i + 1), name: p.name, d: p.d, price: p.price, kind: p.kind,
+        src: p.src, alt: p.alt, fit: p.fit, pad: p.fit === 'cover' ? '0' : '7%', aria: 'See ' + p.name + ' in the shop'
+      })),
+      ticker: this.TICKER,
       facts: this.FACTS,
 
       chips: ['All', 'Necklaces', 'Earrings', 'Bracelets'].map((v) => ({
@@ -1019,7 +958,7 @@ class Component extends DCLogic {
 
       onGo: this.onGo, onCat: this.onCat, onMood: this.onMood, onSearch: this.onSearch,
       onClearFilters: this.onClearFilters, onThumb: this.onThumb,
-      onRailOrder: this.onRailOrder,
+      onRailOrder: this.onRailOrder, onReelPick: this.onReelPick,
       onPick: this.onPick, onField: this.onField, onBack: this.onBack,
       onNext: this.onNext, onReset: this.onReset
     };
