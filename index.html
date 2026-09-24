@@ -25,21 +25,27 @@ a:hover { color: #F3F3F4; }
 input, button { font-family: inherit; font-weight: 300; }
 input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid currentColor; outline-offset: 4px; }
 @keyframes hos-in { from { opacity: 0; transform: translate3d(0,26px,0); } to { opacity: 1; transform: none; } }
-@keyframes hos-rise { from { transform: perspective(1100px) rotateX(7deg) translate3d(0,34px,-50px); } to { transform: none; } }
+@keyframes hos-rise { from { transform: perspective(1100px) rotateX(7deg) translate3d(0,34px,-50px); filter: grayscale(1) sepia(.4) brightness(.55) contrast(.7) blur(1.5px); } 55% { filter: grayscale(.35) sepia(.1) brightness(.9) contrast(.95) blur(0); } to { transform: none; filter: none; } }
+@keyframes hos-polish { from { background-position: 135% 0; opacity: 1; } 80% { opacity: 1; } to { background-position: -35% 0; opacity: 0; } }
 @keyframes hos-mask { from { opacity: 0; transform: translate3d(0,102%,0); } to { opacity: 1; transform: none; } }
 [data-in] { animation: hos-in 1.15s cubic-bezier(.16,1,.3,1) both; }
 [data-in="1"] { animation-delay: .10s; }
 [data-in="2"] { animation-delay: .22s; }
 [data-in="3"] { animation-delay: 1.25s; }
 [data-in="4"] { animation-delay: .46s; }
-[data-reveal] { animation: hos-rise 1.05s cubic-bezier(.16,1,.3,1) both; }
+[data-reveal] { position: relative; animation: hos-rise 1.05s cubic-bezier(.16,1,.3,1) both; }
+/* the polishing cloth: a bright band wiped across as the piece comes clean */
+[data-reveal]::after, [data-rsheen] { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(112deg, rgba(255,255,255,0) 36%, rgba(255,255,255,.5) 47%, rgba(255,255,255,.9) 50%, rgba(255,255,255,.5) 53%, rgba(255,255,255,0) 64%); background-size: 300% 100%; background-position: 135% 0; mix-blend-mode: overlay; opacity: 0; }
+[data-reveal]::after { animation: hos-polish 1.4s cubic-bezier(.45,0,.2,1) .2s both; }
 [data-line] > * { display: block; }
 [data-line].hos-play > * { animation: hos-mask 1.25s cubic-bezier(.16,1,.3,1) both; }
 @supports (animation-timeline: view()) {
   [data-reveal] { animation-timeline: view(); animation-range: entry 4% cover 26%; animation-delay: 0s; }
+  [data-reveal]::after { animation-timeline: view(); animation-range: entry 12% cover 38%; animation-delay: 0s; }
   [data-line] > * { animation: hos-mask 1.25s cubic-bezier(.16,1,.3,1) both; animation-timeline: view(); animation-range: entry 10% cover 30%; }
 }
 [data-reveal].hos-wait { animation: none; }
+[data-reveal].hos-wait::after { animation: none; }
 @keyframes hos-swap { from { opacity: 0; transform: scale(1.05); } to { opacity: 1; transform: none; } }
 @keyframes hos-halo { 0%,100% { opacity: .16; transform: scale(1); } 50% { opacity: .36; transform: scale(1.06); } }
 /* jewellery motion: charm drops in on a spin, letters close round it like links, light runs across the metal */
@@ -59,7 +65,7 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid 
 @keyframes hos-marquee { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
 [data-rimg] { transition: transform .9s cubic-bezier(.16,1,.3,1), filter .9s ease; transform-origin: 50% 0; }
 [data-rframe]:hover [data-rimg] { filter: brightness(1.25) !important; }
-@media (prefers-reduced-motion: reduce) { [data-charm],[data-close],[data-silver],[data-sheen],[data-spark],[data-glint] { animation: none !important; } [data-spark],[data-sheen] { display: none; } }
+@media (prefers-reduced-motion: reduce) { [data-reveal]::after, [data-rsheen] { display: none; } [data-charm],[data-close],[data-silver],[data-sheen],[data-spark],[data-glint] { animation: none !important; } [data-spark],[data-sheen] { display: none; } }
 @media (prefers-reduced-motion: reduce) { [data-anim] { animation: none !important; } }
 </style>
 </helmet>
@@ -69,6 +75,15 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid 
   <div style="position: fixed; top: 0; left: 0; right: 0; height: 1px; z-index: 96; background: rgba(102,107,112,.3);">
     <div data-progress="" style="height: 100%; width: 100%; background: linear-gradient(90deg,#666B70,#F3F3F4,#71808C); transform: scaleX(0); transform-origin: 0 50%;"></div>
   </div>
+
+  <!-- page change: a jump ring closes, flies at you, and you pass through it -->
+  <div data-ring="" aria-hidden="true" style="position: fixed; inset: 0; z-index: 95; pointer-events: none; display: none; overflow: hidden;">
+    <span data-rveil="" style="position: absolute; inset: 0; background: #050606; opacity: 0;"></span>
+    <span data-rring="" style="position: absolute; left: 50%; top: 50%; border-radius: 50%; will-change: transform;"></span>
+  </div>
+
+  <!-- the cursor is the light the metal catches -->
+  <span data-light="" aria-hidden="true" style="position: fixed; left: 0; top: 0; width: 620px; height: 620px; margin: -310px 0 0 -310px; z-index: 94; pointer-events: none; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,255,255,.38), rgba(255,255,255,.12) 42%, rgba(255,255,255,0)); mix-blend-mode: overlay; opacity: 0; transition: opacity .7s ease; will-change: transform;"></span>
 
   <nav data-nav="" style="position: fixed; top: 1px; left: 0; right: 0; z-index: 90; height: 78px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 0 clamp(18px,4vw,60px); border-bottom: 1px solid transparent; transition: background .6s ease, border-color .6s ease;">
     <button type="button" data-go="home" onClick="{{ onGo }}" aria-label="Hands of Silver: home" style="display: flex; align-items: center; background: none; border: 0; padding: 0; cursor: pointer;">
@@ -113,7 +128,7 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid 
       </header>
 
       <!-- II · MANIFESTO on silver -->
-      <section style="position: relative; overflow: hidden; background: #B6B8B8; color: #050606; padding: clamp(56px,6.6vw,104px) clamp(18px,4vw,60px);">
+      <section style="position: relative; overflow: clip; background: #B6B8B8; color: #050606; padding: clamp(56px,6.6vw,104px) clamp(18px,4vw,60px);">
         <div style="max-width: 1320px; margin: 0 auto;">
           <div style="display: flex; flex-direction: column; gap: clamp(2px,.6vw,10px);">
             <sc-for list="{{ creed }}" as="c" hint-placeholder-count="3">
@@ -140,6 +155,7 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid 
                 <div data-rpanel="" style="flex: none; width: clamp(240px,32vw,460px); height: 100%; display: flex; flex-direction: column; gap: 16px;">
                   <button type="button" data-rframe="" data-i="{{ p.i }}" onClick="{{ onReelPick }}" aria-label="{{ p.aria }}" style="position: relative; flex: 1; min-height: 0; padding: 0; border: 1px solid #1c1e1f; background: radial-gradient(62% 56% at 50% 42%, #202324, #090a0a 82%); overflow: hidden; cursor: pointer;">
                     <img data-rimg="" src="{{ p.src }}" alt="{{ p.alt }}" style="width: 100%; height: 100%; object-fit: {{ p.fit }}; padding: {{ p.pad }}; display: block;" />
+                    <span data-rsheen="" style="z-index: 1;"></span>
                   </button>
                   <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;">
                     <div style="min-width: 0;">
@@ -177,7 +193,7 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid 
       </div>
 
       <!-- IV · THE MAKER on paper -->
-      <section style="position: relative; overflow: hidden; background: #F3F3F4; color: #050606; padding: clamp(56px,6.6vw,104px) clamp(18px,4vw,60px);">
+      <section style="position: relative; overflow: clip; background: #F3F3F4; color: #050606; padding: clamp(56px,6.6vw,104px) clamp(18px,4vw,60px);">
         <div style="max-width: 1320px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: clamp(28px,4vw,72px);">
           <div data-reveal="" style="flex: 1 1 300px; min-width: 262px;">
             <p style="margin: 0; max-width: 19ch; font-family: 'BlackChancery','Bodoni Moda',serif; font-weight: 400; font-size: clamp(28px,3.6vw,54px); line-height: 1.08; ">One woman, one pair of pliers.</p>
@@ -195,12 +211,12 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid 
       </section>
 
       <!-- V · TWO WAYS -->
-      <section style="position: relative; overflow: hidden; background: #343534; padding: clamp(56px,6.6vw,104px) clamp(18px,4vw,60px);">
+      <section style="position: relative; overflow: clip; background: #343534; padding: clamp(56px,6.6vw,104px) clamp(18px,4vw,60px);">
         <div style="max-width: 1320px; margin: 0 auto;">
           <h2 data-reveal="" style="margin: 0; max-width: 14ch; font-family: 'Canterbury','Bodoni Moda',serif; font-weight: 400; font-size: clamp(28px,4vw,66px); line-height: 1; color: #F3F3F4;">Two ways in</h2>
 
           <div style="display: flex; flex-wrap: wrap; gap: clamp(16px,2.2vw,30px); margin-top: clamp(26px,3.2vw,46px);">
-            <div data-reveal="" data-tier="" style="position: relative; flex: 1.45 1 340px; min-width: 290px; display: flex; flex-direction: column; justify-content: space-between; gap: 30px; padding: clamp(26px,3vw,46px); background: linear-gradient(152deg,#F3F3F4 0%,#B6B8B8 22%,#666B70 46%,#F3F3F4 68%,#71808C 88%,#343534 100%); color: #050606; overflow: hidden;">
+            <div data-reveal="" data-tier="" style="position: relative; flex: 1.45 1 340px; min-width: 290px; display: flex; flex-direction: column; justify-content: space-between; gap: 30px; padding: clamp(26px,3vw,46px); background: linear-gradient(152deg,#F3F3F4 0%,#B6B8B8 22%,#666B70 46%,#F3F3F4 68%,#71808C 88%,#343534 100%); color: #050606; overflow: clip;">
               <div>
                 <span style="font-size: 9.5px; font-weight: 500; letter-spacing: .34em; text-transform: uppercase;">The higher way</span>
                 <h3 style="margin: 18px 0 0; font-family: 'Canterbury','Bodoni Moda',serif; font-weight: 400; font-size: clamp(32px,4.4vw,74px); line-height: .96; ">Commission</h3>
@@ -542,7 +558,7 @@ class Component extends DCLogic {
   }
   safeCur() { const n = this.list().length; return n ? Math.min(this.state.cur, n - 1) : 0; }
 
-  componentDidMount() { this.schedule(); }
+  componentDidMount() { this.schedule(); this.light(); }
 
   schedule(tries) {
     const t = tries || 0;
@@ -559,7 +575,79 @@ class Component extends DCLogic {
     if (ps.view !== this.state.view) { window.scrollTo({ top: 0, behavior: 'auto' }); this.schedule(); }
     else if (ps.step !== this.state.step) { this.pop('[data-step]'); }
   }
-  componentWillUnmount() { clearTimeout(this._sched); clearTimeout(this._railT); if (this._off) this._off(); if (this._offDrag) this._offDrag(); }
+  componentWillUnmount() { clearTimeout(this._sched); clearTimeout(this._railT); if (this._off) this._off(); if (this._offDrag) this._offDrag(); if (this._offLight) this._offLight(); cancelAnimationFrame(this._ringRaf); }
+
+  // Page change. A silver jump ring arrives from the dark with its cut still open,
+  // closes as it reaches you, and the next page is already waiting inside it;
+  // then it rushes past the camera and you're through.
+  travel(fn) {
+    const wrap = document.querySelector('[data-ring]');
+    const veil = document.querySelector('[data-rveil]'), ring = document.querySelector('[data-rring]');
+    if (this.reduce() || this._travelling || !wrap || !veil || !ring) { fn(); return; }
+    this._travelling = true;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const base = Math.min(vw, vh) * 0.19, T = base * 0.2;
+    const size = 2 * (base + T), ip = (base / (base + T)) * 100;
+    const sEnd = ((Math.hypot(vw, vh) / 2 + T) / base) * 1.1;
+    ring.style.width = ring.style.height = size + 'px';
+    ring.style.margin = (-size / 2) + 'px 0 0 ' + (-size / 2) + 'px';
+    const mask = 'radial-gradient(closest-side, transparent ' + (ip - 0.8) + '%, #000 ' + ip + '%, #000 99%, transparent 100%)';
+    ring.style.webkitMask = mask; ring.style.mask = mask;
+    const tube = 'radial-gradient(closest-side, rgba(0,0,0,.55) ' + ip + '%, rgba(255,255,255,.28) ' + (ip + (100 - ip) * 0.42) + '%, rgba(0,0,0,.5) 100%)';
+    const tones = ['#F3F3F4', '#71808C', '#B6B8B8', '#343534', '#FFFFFF', '#666B70', '#E1E2E2', '#F3F3F4'];
+    const paint = (gap) => {
+      const span = 360 - gap;
+      const stops = tones.map((c, i) => c + ' ' + (gap + (span * i) / (tones.length - 1)).toFixed(1) + 'deg').join(',');
+      return tube + ', conic-gradient(from -90deg, #050606 0deg ' + gap.toFixed(1) + 'deg, ' + stops + ')';
+    };
+    const A = 620, HOLD = 140, B = 760, t0 = performance.now();
+    const out3 = (k) => 1 - Math.pow(1 - k, 3), in4 = (k) => k * k * k * k;
+    let swapped = false;
+    wrap.style.display = 'block';
+    const frame = (now) => {
+      const t = now - t0;
+      let s, gap, vo;
+      if (t < A) {
+        const k = out3(t / A);
+        s = 0.06 + 0.94 * k; gap = 34 * (1 - k); vo = Math.min(1, t / (A * 0.45));
+      } else {
+        if (!swapped) { swapped = true; fn(); }
+        const k = Math.max(0, Math.min(1, (t - A - HOLD) / B));
+        s = 1 + (sEnd - 1) * in4(k); gap = 0; vo = 1;
+      }
+      ring.style.transform = 'scale(' + s.toFixed(4) + ') rotate(' + (t * 0.16).toFixed(1) + 'deg)';
+      ring.style.background = paint(gap);
+      const R = base * s + T * s * 0.3;
+      const hole = 'radial-gradient(circle at 50% 50%, transparent ' + R.toFixed(1) + 'px, #000 ' + (R + 1).toFixed(1) + 'px)';
+      veil.style.webkitMask = hole; veil.style.mask = hole;
+      veil.style.opacity = vo.toFixed(3);
+      if (t < A + HOLD + B) { this._ringRaf = requestAnimationFrame(frame); return; }
+      wrap.style.display = 'none';
+      this._travelling = false;
+    };
+    this._ringRaf = requestAnimationFrame(frame);
+  }
+
+  light() {
+    const el = document.querySelector('[data-light]');
+    if (!el || this.reduce() || !window.matchMedia('(pointer: fine)').matches) return;
+    let tx = 0, ty = 0, x = 0, y = 0, raf = 0, seen = false;
+    const step = () => {
+      x += (tx - x) * 0.13; y += (ty - y) * 0.13;
+      el.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0)';
+      raf = Math.abs(tx - x) + Math.abs(ty - y) > 0.4 ? requestAnimationFrame(step) : 0;
+    };
+    const move = (e) => {
+      tx = e.clientX; ty = e.clientY;
+      if (!seen) { seen = true; x = tx; y = ty; }
+      el.style.opacity = '1';
+      if (!raf) raf = requestAnimationFrame(step);
+    };
+    const leave = () => { el.style.opacity = '0'; };
+    window.addEventListener('pointermove', move, { passive: true });
+    document.documentElement.addEventListener('pointerleave', leave);
+    this._offLight = () => { cancelAnimationFrame(raf); window.removeEventListener('pointermove', move); document.documentElement.removeEventListener('pointerleave', leave); };
+  }
 
   pop(sel) {
     if (this.reduce()) return;
@@ -718,8 +806,14 @@ class Component extends DCLogic {
             const img = el.querySelector('[data-rimg]');
             if (!img || reduce) return;
             img.style.transform = 'rotate(' + (img.style.objectFit === 'cover' ? 0 : -c * 9).toFixed(2) + 'deg) scale(' + (1 - Math.min(1, a) * 0.16).toFixed(3) + ')';
-            img.style.filter = 'brightness(' + (1 - Math.min(1, a) * 0.55).toFixed(2) + ')';
+            const m = Math.min(1, a * 1.5);
+            img.style.filter = 'grayscale(' + m.toFixed(2) + ') sepia(' + (m * 0.35).toFixed(2) + ') brightness(' + (1 - m * 0.5).toFixed(2) + ') contrast(' + (1 - m * 0.2).toFixed(2) + ')';
           });
+          if (near !== this._rnear) {
+            this._rnear = near;
+            const sh = track.querySelectorAll('[data-rsheen]')[near];
+            if (sh && !reduce) { sh.style.animation = 'none'; void sh.offsetWidth; sh.style.animation = 'hos-polish 1.2s cubic-bezier(.45,0,.2,1) .25s both'; }
+          }
           const rc = q('[data-rcount]');
           const pad = (k) => (k < 10 ? '0' : '') + k;
           if (rc) rc.textContent = pad(near + 1) + ' / ' + pad(n);
@@ -742,10 +836,15 @@ class Component extends DCLogic {
 
   onGo = (e) => {
     const v = e.currentTarget.dataset.go;
-    if (v === 'home') { this.setState((st) => ({ view: 'home', visit: (st.visit || 0) + 1 })); return; }
-    if (v === 'commission') this.setState({ view: 'form', mode: 'commission', step: 0, sent: false, o: { house: '', piece: '', mood: '', fit: '', name: '', email: '' } });
-    else if (v === this.state.view) this.replayHome();
-    else this.setState({ view: v });
+    const go = () => {
+      if (v === 'home') { this.setState((st) => ({ view: 'home', visit: (st.visit || 0) + 1 })); return; }
+      if (v === 'commission') this.setState({ view: 'form', mode: 'commission', step: 0, sent: false, o: { house: '', piece: '', mood: '', fit: '', name: '', email: '' } });
+      else if (v === this.state.view) this.replayHome();
+      else this.setState({ view: v });
+    };
+    const to = v === 'commission' ? 'form' : v;
+    if (to !== this.state.view || (v === 'commission' && this.state.mode !== 'commission')) this.travel(go);
+    else go();
   };
   onThumb = (e) => this.setState({ cur: +e.currentTarget.dataset.i }, () => this.rail());
   onCat = (e) => {
@@ -769,13 +868,16 @@ class Component extends DCLogic {
     this.setState((s) => ({ cur: (s.cur + d + n) % n }));
   };
   // a piece tapped in the home-page collection opens in the shop, unfiltered
-  onReelPick = (e) => this.setState({ view: 'shop', cat: 'All', edge: 'Any', q: '', cur: +e.currentTarget.dataset.i });
+  onReelPick = (e) => {
+    const i = +e.currentTarget.dataset.i;
+    this.travel(() => this.setState({ view: 'shop', cat: 'All', edge: 'Any', q: '', cur: i }));
+  };
   onRailOrder = () => { const p = this.list()[this.safeCur()]; if (p) this.startOrder(p.name); };
 
   startOrder(name) {
     const h = this.ALL.find((x) => x.name === name);
     if (!h) return;
-    this.setState({ view: 'form', mode: 'order', step: 1, sent: false, o: { house: h.name, piece: '', mood: h.mood, fit: '', name: '', email: '' } });
+    this.travel(() => this.setState({ view: 'form', mode: 'order', step: 1, sent: false, o: { house: h.name, piece: '', mood: h.mood, fit: '', name: '', email: '' } }));
   }
 
   onPick = (e) => {
