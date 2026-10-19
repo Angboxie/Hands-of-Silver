@@ -32,8 +32,17 @@ const json = (body, status) => new Response(JSON.stringify(body), {
 
 export default async (req) => {
   if (req.method !== 'POST') return json({ error: 'Method not allowed.' }, 405);
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) return json({ error: 'Checkout is not set up yet.' }, 500);
+  const key = ((globalThis.Netlify && Netlify.env.get('STRIPE_SECRET_KEY')) || process.env.STRIPE_SECRET_KEY || '').trim();
+  if (!key) {
+    // name the Stripe-looking variables this function can see (never their values), to spot typos and scope problems
+    const seen = Object.keys(process.env).filter((k) => /stripe/i.test(k));
+    console.error('STRIPE_SECRET_KEY missing; context=' + process.env.CONTEXT + '; stripe-like vars: ' + (seen.join(', ') || 'none'));
+    return json({ error: 'Checkout is not set up yet.', debug: { context: process.env.CONTEXT || null, stripeVarsVisible: seen } }, 500);
+  }
+  if (!/^(sk|rk)_(test|live)_/.test(key)) {
+    console.error('STRIPE_SECRET_KEY does not look like a secret key (starts ' + key.slice(0, 3) + ')');
+    return json({ error: 'Checkout is not set up yet.', debug: { problem: 'STRIPE_SECRET_KEY is set but is not a secret key (should start sk_test_ or sk_live_)' } }, 500);
+  }
 
   let b;
   try { b = await req.json(); } catch (e) { return json({ error: 'Bad request.' }, 400); }
