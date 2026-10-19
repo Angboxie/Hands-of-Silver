@@ -540,10 +540,12 @@ class Component extends DCLogic {
     o: { house: '', piece: '', mood: '', fit: '', name: '', email: '' } };
 
   // ---- THE CATALOG -------------------------------------------------------
-  // To add a piece: copy a line, change every field. That's it — shop grid,
-  // search, filters and the order form all read from this one list.
+  // To add a piece: copy a line, change every field. The shop grid, search,
+  // filters and the order form all read from this one list. For it to be
+  // payable, also add it to CATALOG in netlify/functions/checkout.mjs.
   //   name  → shown everywhere
-  //   price → string, keep the £ sign
+  //   price → string, keep the $ sign. Checkout charges from CATALOG in
+  //           netlify/functions/checkout.mjs, so change the price there too.
   //   d     → one-line description on the product card
   //   src   → path to the photo, under assets/
   //   fit   → 'contain' (whole piece visible) or 'cover' (fills the frame)
@@ -634,7 +636,7 @@ class Component extends DCLogic {
   }
   safeCur() { const n = this.list().length; return n ? Math.min(this.state.cur, n - 1) : 0; }
 
-  componentDidMount() { this._pv = this.state.view; this._ps = this.state.step; this.schedule(); this.light(); }
+  componentDidMount() { this._pv = this.state.view; this._ps = this.state.step; this.schedule(); this.light(); this.fromCheckout(); }
 
   schedule(tries) {
     const t = tries || 0;
@@ -956,9 +958,45 @@ class Component extends DCLogic {
   onBack = () => this.setState((s) => ({ step: Math.max(0, s.step - 1) }));
   onNext = () => {
     if (!this.valid()) return;
-    if (this.state.step >= this.flow().length - 1) { this.sendMail(); this.setState({ sent: true }); }
-    else this.setState((s) => ({ step: s.step + 1 }));
+    if (this.state.step < this.flow().length - 1) { this.setState((s) => ({ step: s.step + 1 })); return; }
+    if (this.state.mode === 'order') { this.checkout(); return; }
+    this.sendMail(); this.setState({ sent: true });
   };
+
+  // Shop orders pay through Stripe Checkout (netlify/functions/checkout.mjs). The order is kept in
+  // sessionStorage so the slip can be shown again when Stripe sends the buyer back.
+  async checkout() {
+    if (this.state.paying) return;
+    const o = this.state.o;
+    this.setState({ paying: true, payErr: '' });
+    try { sessionStorage.setItem('hos-order', JSON.stringify(o)); } catch (e) {}
+    try {
+      const r = await fetch('/api/checkout', {
+        method: 'POST', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ piece: o.house, size: o.fit, name: o.name, email: o.email })
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.url) throw new Error(d.error || 'Checkout is unavailable right now. Please try again shortly.');
+      window.location.href = d.url;
+    } catch (e) {
+      this.setState({ paying: false, payErr: e.message });
+    }
+  }
+
+  // back from Stripe: ?paid=… shows the confirmation slip, ?cancelled=1 returns to the last step
+  fromCheckout() {
+    let qs;
+    try { qs = new URLSearchParams(window.location.search); } catch (e) { return; }
+    const paid = qs.has('paid'), cancelled = qs.has('cancelled');
+    if (!paid && !cancelled) return;
+    try { window.history.replaceState(null, '', window.location.pathname); } catch (e) {}
+    let o = null;
+    try { o = JSON.parse(sessionStorage.getItem('hos-order') || 'null'); } catch (e) {}
+    if (!o || !o.house) return;
+    if (paid) { try { sessionStorage.removeItem('hos-order'); } catch (e) {} }
+    this.setState({ view: 'form', mode: 'order', step: 2, sent: paid, paying: false, o: o,
+      payErr: paid ? '' : 'Payment cancelled. Nothing was charged.' });
+  }
   sendMail() {
     const s = this.state, o = s.o, order = s.mode === 'order';
     const subject = (order ? 'Order' : 'Commission') + ' — HOS·26·0447';
@@ -1111,7 +1149,7 @@ class Component extends DCLogic {
 
       name: o.name, email: o.email,
       sentNote: order
-        ? 'Confirmation for ' + (o.house || 'your piece') + ' is on its way to ' + o.email + '.'
+        ? 'Payment received. A receipt for ' + (o.house || 'your piece') + ' is on its way to ' + o.email + ', and work starts from bare rings now.'
         : 'A drawing and a fixed price reach ' + o.email + ' within two working days.',
 
       slip: [
@@ -1126,8 +1164,8 @@ class Component extends DCLogic {
       estimate: this.money(),
       ready: this.readyBy(),
 
-      hint: ok ? '' : this.gap(),
-      nextLabel: last ? (order ? 'Place order' : 'Send') : 'Next',
+      hint: s.payErr || (ok ? '' : this.gap()),
+      nextLabel: last ? (order ? (s.paying ? 'Opening checkout…' : 'Pay ' + this.money()) : 'Send') : 'Next',
       nextBg: ok ? '#050606' : 'transparent',
       nextFg: ok ? '#F3F3F4' : '#666B70',
       backColor: s.step === 0 ? '#B6B8B8' : '#050606',
