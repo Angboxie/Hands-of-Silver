@@ -141,7 +141,73 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid 
 @media (hover: hover) and (min-width: 761px) { .hos-fork:hover .hos-tine { opacity: .6; } .hos-fork .hos-tine:hover { flex-grow: 1.7; opacity: 1; } }
 @media (max-width: 760px) { .hos-fork { flex-direction: column; } .hos-tine { min-height: 78vh; } .hos-tine-s { border-left: 0; border-top: 1px solid #343534; } }
 
+/* ── order / commission form: one question per screen, on the same dark velvet as the rest of the site ── */
+.hos-form { min-height: 100vh; background: radial-gradient(80% 55% at 50% 0%, #151718, #050606 70%); color: #F3F3F4; padding: 118px clamp(18px,4vw,60px) clamp(60px,8vw,110px); }
+.hos-form-in { max-width: 780px; margin: 0 auto; }
+.hos-form-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.hos-form-kicker { font-size: 10px; letter-spacing: .34em; text-transform: uppercase; color: #8f9296; }
+/* progress: a short chain. Finished steps are closed rings; the current one is open at the top */
+.hos-rings { display: flex; align-items: center; margin-top: clamp(36px,5vw,64px); }
+.hos-ring { position: relative; flex: none; width: 16px; height: 16px; margin-right: 40px; padding: 0; border-radius: 50%; background: none; border: 1.5px solid #343534; cursor: default; transition: border-color .6s ease, transform .6s cubic-bezier(.16,1,.3,1); }
+.hos-ring::after { content: ''; position: absolute; left: calc(100% + 7px); top: 50%; width: 26px; height: 1px; background: #2a2c2d; transition: background .6s ease; }
+.hos-ring[data-last="true"] { margin-right: 0; }
+.hos-ring[data-last="true"]::after { display: none; }
+.hos-ring[data-state="done"] { border-color: #B6B8B8; cursor: pointer; }
+.hos-ring[data-state="done"]::after { background: #666B70; }
+.hos-ring[data-state="done"]:hover { border-color: #F3F3F4; transform: scale(1.18); }
+.hos-ring[data-state="now"] { border-color: #F3F3F4; border-top-color: transparent; box-shadow: 0 0 14px rgba(243,243,244,.25); }
+.hos-rings-n { margin-left: 22px; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: #666B70; }
+.hos-step { margin-top: clamp(26px,3.4vw,40px); }
+.hos-q { margin: 0; font-family: 'Canterbury','Bodoni Moda',serif; font-weight: 400; font-size: clamp(38px,5.6vw,76px); line-height: 1; color: #F3F3F4; }
+.hos-help { margin: 16px 0 0; max-width: 50ch; font-size: 14px; line-height: 1.7; color: #8f9296; text-wrap: pretty; }
+.hos-choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 12px; margin-top: clamp(28px,3.6vw,44px); }
+.hos-choices[data-narrow="true"] { grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); }
+.hos-choice { position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 8px; min-height: 104px; padding: 20px 22px; background: rgba(243,243,244,.02); border: 1px solid #262829; color: #F3F3F4; text-align: left; cursor: pointer; transition: border-color .5s ease, background .5s ease, transform .5s cubic-bezier(.16,1,.3,1); }
+.hos-choices[data-narrow="true"] .hos-choice { min-height: 76px; }
+.hos-choice:hover { border-color: #666B70; background: rgba(243,243,244,.05); transform: translateY(-2px); }
+.hos-choice[data-sel="true"] { border-color: #F3F3F4; background: rgba(243,243,244,.08); }
+/* each card carries a small open ring that closes when it's chosen */
+.hos-choice::after { content: ''; position: absolute; top: 16px; right: 16px; width: 10px; height: 10px; border-radius: 50%; border: 1px solid #3a3d3e; border-top-color: transparent; transition: border-color .4s ease, background .4s ease; }
+.hos-choice[data-sel="true"]::after { border-color: #F3F3F4; background: #F3F3F4; }
+.hos-choice-img { width: 72px; height: 72px; object-fit: contain; margin-bottom: 6px; }
+.hos-choice-v { font-size: 12px; letter-spacing: .24em; text-transform: uppercase; }
+.hos-choice-d { font-size: 13.5px; line-height: 1.45; color: #8f9296; }
+.hos-contact { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,1fr); gap: clamp(26px,4vw,52px); align-items: start; margin-top: clamp(28px,3.6vw,44px); }
+.hos-fields { display: grid; gap: 24px; }
+.hos-field { display: flex; flex-direction: column; gap: 8px; }
+.hos-field > span { font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: #8f9296; }
+.hos-field em { font-style: normal; letter-spacing: .08em; text-transform: none; color: #666B70; }
+.hos-field input, .hos-field textarea { width: 100%; background: transparent; border: 0; border-bottom: 1px solid #343534; border-radius: 0; color: #F3F3F4; font-family: inherit; font-weight: 300; font-size: 16px; padding: 8px 0 10px; transition: border-color .4s ease; }
+.hos-field textarea { min-height: 80px; resize: vertical; line-height: 1.5; }
+.hos-field textarea::placeholder { color: #4a4d4f; }
+.hos-field input:focus-visible, .hos-field textarea:focus-visible { outline: none; border-bottom-color: #F3F3F4; }
+.hos-case { padding: clamp(20px,2.4vw,28px); border: 1px solid #343534; background: linear-gradient(160deg, rgba(243,243,244,.06), rgba(243,243,244,0) 60%); }
+.hos-case-row { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; padding: 10px 0; border-bottom: 1px solid #202223; font-size: 14.5px; }
+.hos-case-row > span:first-child { font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: #8f9296; }
+.hos-case-total { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; margin-top: 20px; }
+.hos-case-k { display: block; font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: #8f9296; }
+.hos-case-big { display: block; margin-top: 6px; font-size: 22px; letter-spacing: .02em; }
+.hos-pay { width: 100%; height: 56px; margin-top: 22px; border: 0; background: #1f2122; color: #666B70; font-size: 10px; font-weight: 500; letter-spacing: .3em; text-transform: uppercase; cursor: pointer; transition: color .5s ease; }
+.hos-pay[data-ready="true"] { color: #050606; background: linear-gradient(100deg, #B6B8B8 0%, #F3F3F4 40%, #FFFFFF 50%, #F3F3F4 60%, #B6B8B8 100%); background-size: 260% 100%; background-position: 160% 0; animation: hos-shine 6s ease-in-out infinite; }
+.hos-hint { display: block; min-height: 1.5em; margin-top: 12px; font-size: 13px; color: #B6B8B8; }
+.hos-secure { display: block; font-size: 10px; line-height: 1.6; letter-spacing: .2em; text-transform: uppercase; color: #666B70; }
+.hos-case-row:first-child { padding-top: 0; }
+.hos-back { margin-top: 36px; }
+.hos-done { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; margin-top: clamp(44px,7vw,96px); }
+.hos-done-ring { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #F3F3F4; box-shadow: 0 0 44px rgba(243,243,244,.28); }
+.hos-done-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.hos-btn { height: 50px; padding: 0 28px; background: #F3F3F4; color: #050606; border: 1px solid #F3F3F4; font-size: 10px; font-weight: 500; letter-spacing: .3em; text-transform: uppercase; cursor: pointer; transition: background .5s ease, color .5s ease; }
+.hos-btn:hover { background: #B6B8B8; }
+.hos-btn-ghost { background: transparent; color: #F3F3F4; border-color: #666B70; }
+.hos-btn-ghost:hover { background: rgba(243,243,244,.08); }
+@media (max-width: 760px) {
+  .hos-contact { grid-template-columns: minmax(0,1fr); }
+  .hos-ring { margin-right: 30px; }
+  .hos-ring::after { width: 16px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .hos-pay[data-ready="true"] { animation: none; }
   .hos-creed, .hos-bands, .hos-mark, .hos-facts, .hos-fork { --p: 1 !important; }
   .hos-tile { --p: 1 !important; }
   .hos-slot-still { display: block; }
@@ -403,118 +469,90 @@ input:focus-visible, button:focus-visible, a:focus-visible { outline: 1px solid 
   </sc-if>
 
   <!-- ══════════ FORM ══════════ -->
+  <!-- one question per screen. Progress is a chain of rings: the current one is open, finished
+       ones are closed (tap one to go back). Picking a card moves on by itself. -->
   <sc-if value="{{ vForm }}" hint-placeholder-val="{{ false }}">
-    <div style="min-height: 100vh; background: #F3F3F4; color: #050606; padding: 112px clamp(18px,4vw,60px) clamp(56px,6.6vw,96px);">
-      <div style="max-width: 1080px; margin: 0 auto;">
-        <button type="button" data-go="{{ backTo }}" onClick="{{ onGo }}" style="background: none; border: 0; padding: 0; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: #666B70; cursor: pointer;" style-hover="color:#050606">← {{ backLabel }}</button>
-
-        <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-top: 20px; padding-bottom: 20px; border-bottom: 1px solid #050606;">
-          <h1 style="margin: 0; font-family: 'Canterbury','Bodoni Moda',serif; font-weight: 400; font-size: clamp(32px,4.4vw,68px); line-height: .96; ">{{ title }}</h1>
-          <span style="font-size: 10px; letter-spacing: .32em; text-transform: uppercase; color: #666B70; padding-bottom: 8px;">{{ subtitle }}</span>
+    <div class="hos-form">
+      <div class="hos-form-in">
+        <div class="hos-form-top">
+          <button type="button" class="hos-link" data-go="{{ backTo }}" onClick="{{ onGo }}">← {{ backLabel }}</button>
+          <span class="hos-form-kicker">{{ title }}</span>
         </div>
 
-        <div style="display: flex; flex-wrap: wrap; gap: clamp(26px,4vw,60px); margin-top: clamp(24px,3vw,42px);">
-          <div style="flex: 2 1 400px; min-width: 288px;">
-            <sc-if value="{{ open }}" hint-placeholder-val="{{ true }}">
-              <div style="display: flex; flex-direction: column; gap: 26px;">
-                <div>
-                  <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 14px;">
-                    <span aria-live="polite" style="font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: #666B70;">{{ stepLabel }}</span>
-                    <button type="button" onClick="{{ onReset }}" style="background: none; border: 0; padding: 0; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: #666B70; cursor: pointer;" style-hover="color:#050606">Clear</button>
+        <sc-if value="{{ open }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div class="hos-rings">
+              <sc-for list="{{ rings }}" as="r" hint-placeholder-count="4">
+                <button type="button" class="hos-ring" data-state="{{ r.st }}" data-last="{{ r.last }}" data-i="{{ r.i }}" onClick="{{ onJump }}" aria-label="{{ r.label }}"></button>
+              </sc-for>
+              <span class="hos-rings-n" aria-live="polite">{{ stepLabel }}</span>
+            </div>
+
+            <div data-step="" class="hos-step">
+              <h1 class="hos-q">{{ stepTitle }}</h1>
+              <p class="hos-help">{{ stepHelp }}</p>
+
+              <sc-if value="{{ isChoice }}" hint-placeholder-val="{{ true }}">
+                <div class="hos-choices" data-narrow="{{ choicesNarrow }}">
+                  <sc-for list="{{ choices }}" as="c">
+                    <button type="button" class="hos-choice" data-f="{{ c.f }}" data-v="{{ c.v }}" data-sel="{{ c.sel }}" onClick="{{ onPick }}">
+                      <sc-if value="{{ c.hasImg }}" hint-placeholder-val="{{ false }}"><img class="hos-choice-img" src="{{ c.src }}" alt="" /></sc-if>
+                      <span class="hos-choice-v">{{ c.v }}</span>
+                      <sc-if value="{{ c.hasD }}" hint-placeholder-val="{{ true }}"><span class="hos-choice-d">{{ c.d }}</span></sc-if>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ isContact }}" hint-placeholder-val="{{ false }}">
+                <div class="hos-contact">
+                  <div class="hos-fields">
+                    <label class="hos-field"><span>Name</span><input data-f="name" onChange="{{ onField }}" value="{{ name }}" type="text" autocomplete="name" /></label>
+                    <label class="hos-field"><span>Email</span><input data-f="email" onChange="{{ onField }}" value="{{ email }}" type="email" inputmode="email" autocomplete="email" /></label>
+                    <sc-if value="{{ askPhone }}" hint-placeholder-val="{{ true }}">
+                      <label class="hos-field"><span>Phone</span><input data-f="phone" onChange="{{ onField }}" value="{{ phone }}" type="tel" inputmode="tel" autocomplete="tel" /></label>
+                    </sc-if>
+                    <sc-if value="{{ askNotes }}" hint-placeholder-val="{{ true }}">
+                      <label class="hos-field"><span>Your idea <em>(optional)</em></span><textarea data-f="notes" onChange="{{ onField }}" value="{{ notes }}" rows="3" maxlength="450" placeholder="Colours, a reference, who it's for…"></textarea></label>
+                    </sc-if>
                   </div>
-                  <div style="display: flex; gap: 4px; margin-top: 12px;">
-                    <sc-for list="{{ bars }}" as="b" hint-placeholder-count="3">
-                      <span style="flex: 1; height: 2px; background: {{ b.c }}; transition: background .6s cubic-bezier(.16,1,.3,1);"></span>
+
+                  <div class="hos-case">
+                    <sc-for list="{{ summary }}" as="l" hint-placeholder-count="3">
+                      <div class="hos-case-row"><span>{{ l.k }}</span><span>{{ l.v }}</span></div>
                     </sc-for>
+                    <div class="hos-case-total">
+                      <div><span class="hos-case-k">{{ totalLabel }}</span><span class="hos-case-big">{{ total }}</span></div>
+                      <sc-if value="{{ hasDeposit }}" hint-placeholder-val="{{ true }}">
+                        <div style="text-align: right;"><span class="hos-case-k">Deposit today</span><span class="hos-case-big">{{ deposit }}</span></div>
+                      </sc-if>
+                    </div>
+                    <button type="button" class="hos-pay" data-ready="{{ payReady }}" onClick="{{ onNext }}">{{ payLabel }}</button>
+                    <span class="hos-hint" aria-live="polite">{{ hint }}</span>
+                    <span class="hos-secure">{{ payNote }}</span>
                   </div>
                 </div>
+              </sc-if>
+            </div>
 
-                <div data-step="" style="display: flex; flex-direction: column; gap: 16px; min-height: 210px;">
-                  <h2 style="margin: 0; font-family: 'Brotheric','Bodoni Moda',serif; font-weight: 400; font-size: clamp(22px,2.4vw,34px); line-height: 1.06; ">{{ stepTitle }}</h2>
-
-                  <sc-if value="{{ isChoice }}" hint-placeholder-val="{{ true }}">
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                        <sc-for list="{{ choices }}" as="c">
-                          <button type="button" data-f="{{ c.f }}" data-v="{{ c.v }}" onClick="{{ onPick }}" style="position: relative; flex: 1 1 {{ c.w }}; min-height: {{ c.h }}; display: flex; align-items: center; gap: 12px; padding: 12px 15px; background: transparent; border: 1px solid #B6B8B8; text-align: left; cursor: pointer; transition: border-color .5s cubic-bezier(.16,1,.3,1);" style-hover="border-color:#050606">
-                            <sc-if value="{{ c.hasImg }}" hint-placeholder-val="{{ false }}">
-                              <span style="flex: none; width: 44px; height: 44px; overflow: hidden; border-radius: 50%; background: #0d0e0e;"><img src="{{ c.src }}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block;" /></span>
-                            </sc-if>
-                            <span style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
-                              <span style="font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #050606;">{{ c.v }}</span>
-                              <sc-if value="{{ c.hasD }}" hint-placeholder-val="{{ true }}"><span style="font-size: 13px; color: #666B70;">{{ c.d }}</span></sc-if>
-                            </span>
-                            <sc-if value="{{ c.sel }}" hint-placeholder-val="{{ false }}"><span style="position: absolute; inset: -1px; border: 2px solid #050606; pointer-events: none;"></span></sc-if>
-                          </button>
-                        </sc-for>
-                      </div>
-                      <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #666B70;">{{ stepHelp }}</p>
-                    </div>
-                  </sc-if>
-
-                  <sc-if value="{{ isContact }}" hint-placeholder-val="{{ false }}">
-                    <div style="display: flex; flex-direction: column; gap: 20px;">
-                      <div style="display: flex; flex-wrap: wrap; gap: 18px;">
-                        <label style="flex: 1 1 190px; display: flex; flex-direction: column; gap: 8px;">
-                          <span style="font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: #666B70;">Name</span>
-                          <input data-f="name" onChange="{{ onField }}" value="{{ name }}" type="text" autocomplete="name" style="background: transparent; border: 0; border-bottom: 1px solid #050606; color: #050606; font-size: 16px; padding: 8px 0;" />
-                        </label>
-                        <label style="flex: 1 1 190px; display: flex; flex-direction: column; gap: 8px;">
-                          <span style="font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: #666B70;">Email</span>
-                          <input data-f="email" onChange="{{ onField }}" value="{{ email }}" type="email" inputmode="email" autocomplete="email" style="background: transparent; border: 0; border-bottom: 1px solid #050606; color: #050606; font-size: 16px; padding: 8px 0;" />
-                        </label>
-                      </div>
-                      <p style="margin: 0; font-size: 13px; line-height: 1.65; color: #666B70;">{{ stepHelp }}</p>
-                    </div>
-                  </sc-if>
-                </div>
-
-                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; padding-top: 20px; border-top: 1px solid #B6B8B8;">
-                  <button type="button" onClick="{{ onBack }}" style="background: none; border: 0; padding: 6px 0; font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: {{ backColor }}; cursor: pointer;">← Back</button>
-                  <div style="display: flex; align-items: center; gap: 18px;">
-                    <span aria-live="polite" style="font-size: 13px; color: #666B70;">{{ hint }}</span>
-                    <button type="button" onClick="{{ onNext }}" style="height: 52px; padding: 0 32px; border: 1px solid #050606; background: {{ nextBg }}; color: {{ nextFg }}; font-size: 10px; font-weight: 500; letter-spacing: .28em; text-transform: uppercase; cursor: pointer; transition: background .5s cubic-bezier(.16,1,.3,1);">{{ nextLabel }}</button>
-                  </div>
-                </div>
-              </div>
-            </sc-if>
-
-            <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
-              <div style="display: flex; flex-direction: column; justify-content: center; gap: 16px; min-height: 290px;">
-                <span style="font-size: 10px; letter-spacing: .32em; text-transform: uppercase; color: #666B70;">{{ ref }}</span>
-                <h2 style="margin: 0; font-family: 'BlackChancery','Bodoni Moda',serif; font-weight: 400; font-size: clamp(26px,3vw,44px); line-height: 1.06; ">Request received.</h2>
-                <p style="margin: 0; max-width: 40ch; font-size: 15px; line-height: 1.7; color: #343534;">{{ sentNote }}</p>
-                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                  <button type="button" data-go="shop" onClick="{{ onGo }}" style="height: 48px; padding: 0 26px; background: #050606; color: #F3F3F4; border: 0; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; cursor: pointer; transition: background .5s;" style-hover="background:#343534">Shop</button>
-                  <button type="button" onClick="{{ onReset }}" style="height: 48px; padding: 0 26px; background: transparent; border: 1px solid #050606; color: #050606; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; cursor: pointer; transition: background .5s, color .5s;" style-hover="background:#050606;color:#F3F3F4">Start another</button>
-                </div>
-              </div>
+            <sc-if value="{{ showBack }}" hint-placeholder-val="{{ false }}">
+              <button type="button" class="hos-link hos-back" onClick="{{ onBack }}">← Back</button>
             </sc-if>
           </div>
+        </sc-if>
 
-          <aside style="flex: 1 1 248px; min-width: 232px; align-self: flex-start;">
-            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid #050606;">
-              <span style="font-size: 10px; letter-spacing: .32em; text-transform: uppercase;">Slip</span>
-              <span style="font-size: 10px; letter-spacing: .14em; color: #666B70;">{{ ref }}</span>
+        <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+          <div class="hos-done">
+            <span class="hos-done-ring" aria-hidden="true"></span>
+            <span class="hos-form-kicker">{{ ref }}</span>
+            <h1 class="hos-q">{{ sentTitle }}</h1>
+            <p class="hos-help">{{ sentNote }}</p>
+            <div class="hos-done-actions">
+              <button type="button" class="hos-btn" data-go="shop" onClick="{{ onGo }}">Shop</button>
+              <button type="button" class="hos-btn hos-btn-ghost" data-go="home" onClick="{{ onGo }}">Home</button>
             </div>
-            <sc-for list="{{ slip }}" as="l" hint-placeholder-count="4">
-              <div style="display: flex; align-items: baseline; gap: 12px; padding: 11px 0; border-bottom: 1px solid #B6B8B8;">
-                <span style="flex: none; width: 56px; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #666B70;">{{ l.k }}</span>
-                <span style="flex: 1; font-size: 15px; line-height: 1.35; color: {{ l.c }};">{{ l.v }}</span>
-              </div>
-            </sc-for>
-            <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 22px;">
-              <div>
-                <div style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #666B70;">{{ totalLabel }}</div>
-                <div style="font-size: 23px; font-weight: 400; letter-spacing: .02em; line-height: 1.2; margin-top: 6px;">{{ estimate }}</div>
-              </div>
-              <div style="text-align: right;">
-                <div style="font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #666B70;">In hand</div>
-                <div style="font-size: 14px; margin-top: 8px;">{{ ready }}</div>
-              </div>
-            </div>
-          </aside>
-        </div>
+          </div>
+        </sc-if>
       </div>
     </div>
   </sc-if>
@@ -537,7 +575,8 @@ const E = 'cubic-bezier(.16,1,.3,1)';
 
 class Component extends DCLogic {
   state = { view: 'home', mode: 'commission', cat: 'All', edge: 'Any', q: '', cur: 0, step: 0, sent: false,
-    o: { house: '', piece: '', mood: '', fit: '', name: '', email: '' } };
+    o: this.blank() };
+  blank() { return { house: '', piece: '', mood: '', fit: '', name: '', email: '', phone: '', notes: '' }; }
 
   // ---- THE CATALOG -------------------------------------------------------
   // To add a piece: copy a line, change every field. The shop grid, search,
@@ -613,6 +652,7 @@ class Component extends DCLogic {
     'A set': { t: 'Roughly what size?', o: ['Petite', 'Standard', 'Generous', 'Not sure'], h: 'Each piece in the set is confirmed with you before starting.' }
   };
   BASE = { Necklace: 300, Earrings: 130, Bracelet: 110, 'A set': 380 };
+  DEPOSIT = 5; // commission deposit in dollars; the amount actually charged is DEPOSIT in netlify/functions/checkout.mjs
   MOODM = { Soft: 1, Sharp: 1.2, Feral: 1.5 };
 
   flow() { return this.state.mode === 'order' ? ['which', 'fit', 'contact'] : ['piece', 'mood', 'fit', 'contact']; }
@@ -907,7 +947,7 @@ class Component extends DCLogic {
     const v = e.currentTarget.dataset.go;
     const go = () => {
       if (v === 'home') { this.setState((st) => ({ view: 'home', visit: (st.visit || 0) + 1 })); return; }
-      if (v === 'commission') this.setState({ view: 'form', mode: 'commission', step: 0, sent: false, o: { house: '', piece: '', mood: '', fit: '', name: '', email: '' } });
+      if (v === 'commission') this.setState({ view: 'form', mode: 'commission', step: 0, sent: false, paying: false, payErr: '', o: this.blank() });
       else if (v === this.state.view) this.replayHome();
       else this.setState({ view: v });
     };
@@ -946,35 +986,44 @@ class Component extends DCLogic {
   startOrder(name) {
     const h = this.ALL.find((x) => x.name === name);
     if (!h) return;
-    this.travel(() => this.setState({ view: 'form', mode: 'order', step: 1, sent: false, o: { house: h.name, piece: '', mood: h.mood, fit: '', name: '', email: '' } }));
+    this.travel(() => this.setState({ view: 'form', mode: 'order', step: 1, sent: false, paying: false, payErr: '', o: Object.assign(this.blank(), { house: h.name, mood: h.mood }) }));
   }
 
+  // a card is the whole step, so once the choice has shown, move on by itself
   onPick = (e) => {
     const d = e.currentTarget.dataset;
     if (d.f === 'piece' || d.f === 'house') this.set({ [d.f]: d.v, fit: '' });
     else this.set({ [d.f]: d.v });
+    const step = this.state.step;
+    clearTimeout(this._adv);
+    this._adv = setTimeout(() => { if (this.state.step === step && this.valid()) this.setState({ step: step + 1, payErr: '' }); }, 420);
   };
   onField = (e) => this.set({ [e.currentTarget.dataset.f]: e.currentTarget.value });
-  onBack = () => this.setState((s) => ({ step: Math.max(0, s.step - 1) }));
+  onBack = () => { clearTimeout(this._adv); this.setState((s) => ({ step: Math.max(0, s.step - 1), payErr: '' })); };
+  // a closed ring in the progress chain jumps back to that step
+  onJump = (e) => {
+    const i = +e.currentTarget.dataset.i;
+    if (i < this.state.step) { clearTimeout(this._adv); this.setState({ step: i, payErr: '' }); }
+  };
   onNext = () => {
     if (!this.valid()) return;
     if (this.state.step < this.flow().length - 1) { this.setState((s) => ({ step: s.step + 1 })); return; }
-    if (this.state.mode === 'order') { this.checkout(); return; }
-    this.sendMail(); this.setState({ sent: true });
+    this.checkout();
   };
 
-  // Shop orders pay through Stripe Checkout (netlify/functions/checkout.mjs). The order is kept in
-  // sessionStorage so the slip can be shown again when Stripe sends the buyer back.
+  // Both routes pay through Stripe Checkout (netlify/functions/checkout.mjs): a shop order pays in
+  // full, a commission pays the deposit. The form is kept in sessionStorage so it can be shown
+  // again when Stripe sends the buyer back.
   async checkout() {
     if (this.state.paying) return;
-    const o = this.state.o;
+    const s = this.state, o = s.o;
+    const body = s.mode === 'order'
+      ? { type: 'order', piece: o.house, size: o.fit, name: o.name, email: o.email }
+      : { type: 'commission', piece: o.piece, edge: o.mood, size: o.fit, name: o.name, email: o.email, phone: o.phone, notes: o.notes };
     this.setState({ paying: true, payErr: '' });
-    try { sessionStorage.setItem('hos-order', JSON.stringify(o)); } catch (e) {}
+    try { sessionStorage.setItem('hos-order', JSON.stringify({ mode: s.mode, o: o })); } catch (e) {}
     try {
-      const r = await fetch('/api/checkout', {
-        method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ piece: o.house, size: o.fit, name: o.name, email: o.email })
-      });
+      const r = await fetch('/api/checkout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
       const d = await r.json().catch(() => ({}));
       if (!r.ok || !d.url) throw new Error(d.error || 'Checkout is unavailable right now. Please try again shortly.');
       window.location.href = d.url;
@@ -983,54 +1032,44 @@ class Component extends DCLogic {
     }
   }
 
-  // back from Stripe: ?paid=… shows the confirmation slip, ?cancelled=1 returns to the last step
+  // back from Stripe: ?paid=<session> shows the confirmation, ?cancelled=1 returns to the last step
   fromCheckout() {
     let qs;
     try { qs = new URLSearchParams(window.location.search); } catch (e) { return; }
-    const paid = qs.has('paid'), cancelled = qs.has('cancelled');
+    const paid = qs.get('paid'), cancelled = qs.has('cancelled');
     if (!paid && !cancelled) return;
     try { window.history.replaceState(null, '', window.location.pathname); } catch (e) {}
-    let o = null;
-    try { o = JSON.parse(sessionStorage.getItem('hos-order') || 'null'); } catch (e) {}
-    if (!o || !o.house) return;
+    let saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem('hos-order') || 'null'); } catch (e) {}
+    if (!saved || !saved.o) return;
     if (paid) { try { sessionStorage.removeItem('hos-order'); } catch (e) {} }
-    this.setState({ view: 'form', mode: 'order', step: 2, sent: paid, paying: false, o: o,
+    const mode = saved.mode === 'order' ? 'order' : 'commission';
+    this.setState({ view: 'form', mode: mode, step: mode === 'order' ? 2 : 3, sent: !!paid, paying: false,
+      o: Object.assign(this.blank(), saved.o),
+      // the same reference the business email carries
+      ref: paid ? 'HOS-' + String(paid).slice(-6).toUpperCase() : '',
       payErr: paid ? '' : 'Payment cancelled. Nothing was charged.' });
   }
-  sendMail() {
-    const s = this.state, o = s.o, order = s.mode === 'order';
-    const subject = (order ? 'Order' : 'Commission') + ' — HOS·26·0447';
-    const lines = [
-      'Route: ' + (order ? 'Ready piece' : 'Commission'),
-      'Piece: ' + (o.house || o.piece || '—'),
-      'Edge: ' + (o.mood || '—'),
-      'Size: ' + (o.fit || '—'),
-      'Name: ' + (o.name || '—'),
-      'Email: ' + (o.email || '—'),
-      'Estimate: ' + this.money()
-    ];
-    const body = encodeURIComponent(lines.join('\n'));
-    const href = 'mailto:business.handsofsilver@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + body;
-    const a = document.createElement('a');
-    a.href = href;
-    a.click();
-  }
-  onReset = () => this.setState({ step: 0, sent: false, o: { house: '', piece: '', mood: '', fit: '', name: '', email: '' } });
+  onReset = () => this.setState({ step: 0, sent: false, paying: false, payErr: '', o: this.blank() });
 
+  phoneOk(p) {
+    const digits = String(p || '').replace(/\D/g, '');
+    return /^[+\d\s().-]+$/.test(String(p || '').trim()) && digits.length >= 8 && digits.length <= 15;
+  }
   valid() {
     const o = this.state.o, k = this.key();
     if (k === 'which') return !!o.house;
     if (k === 'piece') return !!o.piece;
     if (k === 'mood') return !!o.mood;
     if (k === 'fit') return !!o.fit;
-    return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(o.email) && o.name.trim().length > 1;
+    const contactOk = o.name.trim().length > 1 && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(o.email.trim());
+    return this.state.mode === 'order' ? contactOk : contactOk && this.phoneOk(o.phone);
   }
   gap() {
-    const o = this.state.o, k = this.key();
-    if (k === 'which' || k === 'piece' || k === 'mood') return 'Pick one';
-    if (k === 'fit') return 'Pick a size';
-    if (!o.name.trim()) return 'Add your name';
-    return 'Add a valid email';
+    const o = this.state.o;
+    if (o.name.trim().length < 2) return 'Add your name to continue.';
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(o.email.trim())) return 'Add a valid email to continue.';
+    return 'Add a phone number to continue.';
   }
   money() {
     const o = this.state.o;
@@ -1040,7 +1079,7 @@ class Component extends DCLogic {
     }
     if (!o.piece) return '—';
     const n = this.BASE[o.piece] * (this.MOODM[o.mood] || 1);
-    return '$' + (Math.round(n * 0.9 / 5) * 5) + ' — $' + (Math.round(n * 1.15 / 5) * 5);
+    return '$' + (Math.round(n * 0.9 / 5) * 5) + '–' + (Math.round(n * 1.15 / 5) * 5);
   }
   readyBy() {
     const d = new Date(); d.setDate(d.getDate() + 30);
@@ -1048,39 +1087,35 @@ class Component extends DCLogic {
   }
 
   stepData() {
-    const o = this.state.o, k = this.key();
+    const o = this.state.o, k = this.key(), order = this.state.mode === 'order';
     const fit = this.FITS[this.kind()] || this.FITS['A set'];
     if (k === 'which') return {
       t: 'Which one?', h: 'Each is built from bare rings after you order.',
-      c: this.ALL.map((p) => ({ f: 'house', v: p.name, d: p.price, src: p.src, hasImg: true, hasD: true, sel: o.house === p.name, w: '150px', h: '64px' }))
+      c: this.ALL.map((p) => ({ f: 'house', v: p.name, d: p.price, src: p.src, hasImg: true, hasD: true, sel: o.house === p.name }))
     };
     if (k === 'piece') return {
-      t: 'What are we making?', h: 'Anything not on this list — pick the closest and say more by email.',
-      c: this.KINDS.map((p) => ({ f: 'piece', v: p.v, d: p.d, hasImg: false, hasD: true, sel: o.piece === p.v, w: '150px', h: '70px' }))
+      t: 'What are we making?', h: 'Not on the list? Pick the closest and describe it at the end.',
+      c: this.KINDS.map((p) => ({ f: 'piece', v: p.v, d: p.d, hasImg: false, hasD: true, sel: o.piece === p.v }))
     };
     if (k === 'mood') return {
       t: 'How sharp?', h: 'This sets the spike count and the weight of the weave.',
-      c: this.MOODS.map((m) => ({ f: 'mood', v: m.v, d: m.d, hasImg: false, hasD: true, sel: o.mood === m.v, w: '150px', h: '70px' }))
+      c: this.MOODS.map((m) => ({ f: 'mood', v: m.v, d: m.d, hasImg: false, hasD: true, sel: o.mood === m.v }))
     };
     if (k === 'fit') return {
-      t: fit.t, h: fit.h,
-      c: fit.o.map((v) => ({ f: 'fit', v: v, d: '', hasImg: false, hasD: false, sel: o.fit === v, w: '106px', h: '54px' }))
+      t: fit.t, h: fit.h, narrow: true,
+      c: fit.o.map((v) => ({ f: 'fit', v: v, d: '', hasImg: false, hasD: false, sel: o.fit === v }))
     };
-    return {
-      t: 'Where does it go?',
-      h: this.state.mode === 'order' ? 'Confirmation and a payment link the same day.' : 'A drawing and a fixed price within two working days.',
-      c: []
-    };
+    return order
+      ? { t: 'Who is it for?', h: 'Card and delivery address are taken on the next page, by Stripe.', c: [] }
+      : { t: 'Tell her about it.', h: 'A sketch and a fixed price reach you within two working days. The $' + this.DEPOSIT + ' deposit holds your place in her queue.', c: [] };
   }
 
   renderVals() {
     const s = this.state, o = s.o, k = this.key(), flow = this.flow();
     const ok = this.valid();
-    const last = s.step >= flow.length - 1;
     const order = s.mode === 'order';
     const view = s.view;
     const sd = this.stepData();
-    const line = (kk, v) => ({ k: kk, v: v || '-', c: v ? '#050606' : '#9AA0A4' });
     const nOn = (v) => (view === v ? '#F3F3F4' : 'transparent');
     const nFg = (v) => (view === v ? '#F3F3F4' : '#B6B8B8');
     const commOn = view === 'form' && !order;
@@ -1135,45 +1170,47 @@ class Component extends DCLogic {
       curKind: cur ? cur.kind : '', curMood: cur ? cur.mood : '',
 
       title: order ? 'Your order' : 'Commission',
-      subtitle: order ? 'Three steps' : 'Four steps',
       backTo: order ? 'shop' : 'home',
       backLabel: order ? 'Shop' : 'Home',
 
       open: !s.sent, sent: s.sent,
       isChoice: !s.sent && k !== 'contact',
       isContact: !s.sent && k === 'contact',
-      stepTitle: sd.t, stepHelp: sd.h, choices: sd.c,
+      stepTitle: sd.t, stepHelp: sd.h, choices: sd.c, choicesNarrow: !!sd.narrow,
+      // a shop order starts on step 2 (the piece is already chosen), so Back only shows past that
+      showBack: !s.sent && s.step > 0,
 
-      stepLabel: 'Step ' + (s.step + 1) + ' of ' + flow.length,
-      bars: flow.map((_, i) => ({ c: i <= s.step ? '#050606' : '#B6B8B8' })),
+      stepLabel: (s.step + 1) + ' of ' + flow.length,
+      rings: flow.map((f, i) => ({
+        i: i, last: i === flow.length - 1,
+        st: i < s.step ? 'done' : i === s.step ? 'now' : 'todo',
+        label: 'Step ' + (i + 1) + (i < s.step ? ', done: go back to it' : '')
+      })),
 
-      name: o.name, email: o.email,
-      sentNote: order
-        ? 'Payment received. A receipt for ' + (o.house || 'your piece') + ' is on its way to ' + o.email + ', and work starts from bare rings now.'
-        : 'A drawing and a fixed price reach ' + o.email + ' within two working days.',
-
-      slip: [
-        line('Route', order ? 'From the shop' : 'Commission'),
-        line('Piece', o.house || o.piece),
-        line('Edge', o.mood),
-        line('Size', o.fit),
-        line('Name', o.name)
-      ],
-      ref: 'HOS·26·0447',
+      name: o.name, email: o.email, phone: o.phone, notes: o.notes,
+      askPhone: !order, askNotes: !order,
+      summary: (order
+        ? [['Piece', o.house], ['Size', o.fit], ['Ready by', this.readyBy()]]
+        : [['Piece', o.piece], ['Edge', o.mood], ['Size', o.fit]]
+      ).map((r) => ({ k: r[0], v: r[1] || '—' })),
       totalLabel: order ? 'Total' : 'Estimate',
-      estimate: this.money(),
-      ready: this.readyBy(),
+      total: this.money(),
+      hasDeposit: !order, deposit: '$' + this.DEPOSIT,
+      payReady: ok && !s.paying,
+      payLabel: s.paying ? 'Opening checkout…' : order ? 'Pay ' + this.money() : 'Pay $' + this.DEPOSIT + ' deposit',
+      payNote: order ? 'Secure payment by Stripe' : 'Secure payment by Stripe · balance quoted after the sketch',
+      hint: s.payErr || (ok || k !== 'contact' ? '' : this.gap()),
 
-      hint: s.payErr || (ok ? '' : this.gap()),
-      nextLabel: last ? (order ? (s.paying ? 'Opening checkout…' : 'Pay ' + this.money()) : 'Send') : 'Next',
-      nextBg: ok ? '#050606' : 'transparent',
-      nextFg: ok ? '#F3F3F4' : '#666B70',
-      backColor: s.step === 0 ? '#B6B8B8' : '#050606',
+      sentTitle: order ? 'Payment received.' : 'Deposit received.',
+      sentNote: order
+        ? 'A receipt for ' + (o.house || 'your piece') + ' is on its way to ' + o.email + '. Work starts from bare rings now.'
+        : 'Your place is held. A sketch and a fixed price for your ' + (o.piece || 'piece').toLowerCase() + ' reach ' + o.email + ' within two working days.',
+      ref: s.ref || '',
 
       onGo: this.onGo, onCat: this.onCat, onMood: this.onMood, onSearch: this.onSearch,
       onClearFilters: this.onClearFilters, onThumb: this.onThumb,
       onRailOrder: this.onRailOrder, onReelPick: this.onReelPick,
-      onPick: this.onPick, onField: this.onField, onBack: this.onBack,
+      onPick: this.onPick, onField: this.onField, onBack: this.onBack, onJump: this.onJump,
       onNext: this.onNext, onReset: this.onReset
     };
   }
